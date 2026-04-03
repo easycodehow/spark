@@ -1,0 +1,338 @@
+# spark 메모앱 개발가이드
+
+## 기본 원칙
+- "시작" 또는 "진행"이라고 명시적으로 말하기 전까지는 어떤 작업도 시작하지 말 것
+- 작업 순서는 체크리스트를 확인하여 순서대로 진행할 것
+- 진행 완료된 체크리스트에 체크 표시 할 것
+- 작업 전 항상 계획을 먼저 설명하고 승인을 받을 것
+- 파일 수정 시 변경 내용을 먼저 요약할 것
+- 각 작업 완료 후 CLAUDE.md 체크리스트를 반드시 업데이트 할 것
+- [x] 처리 시 완료 날짜를 괄호로 표기할 것. 예: - [x] 로그인 UI (2026-04-01)
+
+## 절대 금지 사항
+- 승인 없이 파일 삭제 금지
+- 여러 단계를 한 번에 진행 금지
+- 체크리스트에 없는 기능 임의 추가 금지
+- 라이브러리 / 프레임워크 임의 설치 금지
+
+---
+
+## 프로젝트 정보
+- **프로젝트명**: spark-memo-app
+- **앱 이름**: SPARK
+- **설명**: PWA 기반 오프라인 메모장 애플리케이션
+
+---
+
+## 디자인 기획
+
+### 컨셉
+- **앱 무드**: 밝고 에너지 넘치는
+- **타겟 사용자**: 나
+
+### 컬러 시스템
+
+#### Brand Colors
+| 역할 | 변수명 | HEX | 용도 |
+|------|--------|-----|------|
+| Brand Green | `--color-brand` | `#3dce5c` | 헤더, 로고, 주요 액션 버튼 |
+| Point Pink | `--color-point` | `#FF8FAB` | 별표 아이콘, 중요 메모 강조 |
+
+#### Light Mode
+| 역할 | 변수명 | HEX | 용도 |
+|------|--------|-----|------|
+| Background | `--color-bg` | `#F0FAF0` | 페이지 전체 배경 |
+| Title | `--color-text-title` | `#2C3E50` | 제목, 강조 텍스트 |
+| Body | `--color-text-body` | `#5D6D7E` | 본문, 일반 텍스트 |
+| Placeholder | `--color-text-muted` | `#95A5A6` | 플레이스홀더, 비활성 텍스트 |
+
+#### Dark Mode
+| 역할 | 변수명 | HEX | 용도 |
+|------|--------|-----|------|
+| Header | `--color-header-dark` | `#192A1A` | 다크모드 헤더 배경 |
+| Background | `--color-bg-dark` | `#111111` | 다크모드 페이지 배경 |
+| Title | `--color-text-title-dark` | `#E8F5E9` | 다크모드 제목 텍스트 |
+| Body | `--color-text-body-dark` | `#B2C8B4` | 다크모드 본문 텍스트 |
+| Placeholder | `--color-text-muted-dark` | `#5A7A5C` | 다크모드 플레이스홀더 |
+| Point Pink (dark) | `--color-point-dark` | `#FFB3C8` | 다크모드 별표 아이콘 |
+
+#### CSS 변수 선언 규칙
+- 모든 CSS 변수는 `css/style.css` 상단의 `:root {}` 블록에만 선언
+- 다크모드 변수는 `[data-theme="dark"] {}` 셀렉터로 관리
+- 변수명 임의 변경 금지
+
+### 타이포그래피
+- **기본 폰트**: Pretendard
+- **폰트 파일 위치**: `/public/fonts/pretendard/` (woff2, web/static 서브셋)
+- **사용 웨이트**: 400 Regular · 500 Medium · 600 SemiBold · 700 Bold
+- **font-family 선언**: `'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif`
+
+### 아이콘
+- **라이브러리**: lucide-react
+
+### UI 레이아웃 규칙
+- **다크모드 토글**: 헤더 우측 아이콘 버튼으로 배치
+- **글자크기 조절**: 더보기 메뉴(⋮) 내부에 배치
+
+---
+
+## 기술 스택
+- Frontend: HTML5, CSS3, Vanilla JavaScript
+- PWA: Service Worker, Web App Manifest
+- Storage: LocalStorage (메모 저장)
+- Backup: JSON 파일 내보내기/가져오기
+- 배포: Vercel
+- 버전관리: GitHub
+
+## 파일 구조
+```
+spark/
+├── index.html
+├── manifest.json
+├── sw.js
+├── .gitignore
+├── css/
+│   └── style.css
+├── js/
+│   ├── app.js
+│   └── sw-register.js
+├── icons/
+│   ├── icon-192x192.png
+│   └── icon-512x512.png
+└── public/
+    └── fonts/
+        └── pretendard/
+            └── woff2/
+                ├── Pretendard-Regular.woff2
+                ├── Pretendard-Medium.woff2
+                ├── Pretendard-SemiBold.woff2
+                ├── Pretendard-Bold.woff2
+                └── (외 5종)
+```
+
+---
+
+## 코딩 규칙
+
+### HTML
+- 시맨틱 태그 우선 사용 (header, nav, main, article, section, footer)
+- 주석은 한국어로 작성
+- 들여쓰기는 2칸
+
+### CSS
+- 클래스명은 명확한 의미 전달
+- Vanilla CSS 사용 (프레임워크 사용 금지)
+- 주석으로 섹션 구분
+- 컬러 시스템은 CSS 변수로 관리 (변수명 임의 변경 금지)
+
+### JavaScript
+- ES6+ 문법 사용
+- 가독성을 위해 함수는 작게 분리
+- 주석은 한국어로 작성
+
+---
+
+## 메모 데이터 구조
+
+모든 메모는 아래 구조로 저장한다. **2단계부터 이 구조를 그대로 사용할 것.**
+
+```json
+{
+  "id": "uuid",
+  "content": "메모 내용",
+  "folder": null,
+  "starred": false,
+  "images": [],
+  "createdAt": "2026-04-01T00:00:00.000Z",
+  "updatedAt": "2026-04-01T00:00:00.000Z"
+}
+```
+
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| `id` | string | crypto.randomUUID() 로 생성 |
+| `content` | string | 메모 본문 전체 |
+| `folder` | string \| null | 폴더명 (없으면 null = 미분류) |
+| `starred` | boolean | 중요 메모 여부 |
+| `images` | array | Base64 이미지 배열 (초기값 []) |
+| `createdAt` | ISO8601 | 생성 시각 |
+| `updatedAt` | ISO8601 | 마지막 수정 시각 |
+
+---
+
+## 전체 진행 상황
+- [ ] 1단계: 프로젝트 기본 설정
+- [ ] 2단계: 메모앱 기본 기능 CRUD
+- [ ] 3단계: UI 확장 (상세보기 / 더보기 메뉴 / 다크모드 / 글자크기)
+- [ ] 4단계: PWA 기능 (Manifest / Service Worker / 오프라인)
+- [ ] 5단계: 데이터 관리 (백업·복원 / 이미지 첨부)
+- [ ] 6단계: 고급 PWA 기능 (설치 배너 / 햅틱 / Wake Lock)
+- [ ] 7단계: 배포 및 테스트
+- [ ] 8단계: 추가기능 — 폴더 관리
+
+---
+
+## 1단계. 프로젝트 기본 설정
+
+### 파일 구조 생성
+- [x] `index.html` 파일 생성 (2026-04-03)
+- [x] `css/style.css` 파일 생성 (`:root` CSS 변수 포함) (2026-04-03)
+- [x] `js/app.js` 파일 생성 (2026-04-03)
+- [x] `manifest.json` 파일 생성 (2026-04-03)
+- [x] `icons/icon-192x192.png` 배치 확인 (2026-04-03)
+- [x] `icons/icon-512x512.png` 배치 확인 (2026-04-03)
+
+### Git 설정
+- [ ] GitHub 저장소 생성
+- [x] `.gitignore` 파일 생성 (2026-04-03)
+- [ ] 첫 커밋 완료
+- [ ] 원격 저장소 연결 완료
+
+---
+
+## 2단계. 메모앱 기본 기능 (CRUD)
+
+> ⚠️ 메모 저장 시 반드시 위의 **메모 데이터 구조**를 사용할 것
+> `folder: null`, `images: []` 포함하여 처음부터 완전한 구조로 저장
+
+### 화면 레이아웃
+- [ ] 메모 입력 영역 (textarea)
+- [ ] 메모 저장 버튼
+- [ ] 중요 메모 토글 버튼 (별 버튼)
+- [ ] 메모 목록 보기
+- [ ] 검색 입력창
+- [ ] 중요 메모 필터 버튼 (토글)
+- [ ] 기본 스타일링 (CSS)
+
+### 메모 저장/불러오기
+- [ ] LocalStorage에 메모 저장 (브라우저 종료 후에도 유지)
+- [ ] 저장된 메모 불러오기
+- [ ] 각 메모마다 고유 ID 부여 (`crypto.randomUUID()`)
+
+### CRUD 기능
+- [ ] **C**reate: 새 메모 추가
+- [ ] **R**ead: 메모 목록 보기
+- [ ] **U**pdate: 메모 수정 (`updatedAt` 갱신 포함)
+- [ ] **D**elete: 메모 삭제
+
+### 검색 & 필터
+- [ ] 실시간 키워드 검색
+- [ ] 중요 메모만 보기 필터
+
+---
+
+## 3단계. UI 확장
+
+### 상세보기 화면
+- [ ] 메모 클릭 시 상세보기 열기
+- [ ] 수정 버튼
+- [ ] 삭제 버튼
+- [ ] 공유 버튼 (Web Share API)
+- [ ] 복사 버튼 (Clipboard API)
+- [ ] 뒤로가기 버튼
+
+### 더보기 메뉴 (⋮)
+- [ ] 더보기 메뉴 UI 및 열기/닫기
+- [ ] 메모 내보내기 버튼 연결
+- [ ] 메모 가져오기 버튼 연결
+- [ ] 글자크기 조절 (작게 / 보통 / 크게) + LocalStorage 저장
+
+### 헤더
+- [ ] 다크모드 토글 버튼 (헤더 우측 아이콘) + LocalStorage 저장
+
+---
+
+## 4단계. PWA 기능
+
+### Web App Manifest
+- [ ] `manifest.json` 작성 (앱 이름, 아이콘, 테마 색상, 시작 URL)
+- [ ] `index.html`에 manifest 연결
+
+### Service Worker
+- [ ] `sw.js` 생성 — 캐시 파일 목록 정의
+- [ ] 오프라인에서 캐시된 파일 제공
+- [ ] `js/sw-register.js` 생성 (Service Worker 등록)
+
+### 오프라인 동작 테스트
+- [ ] Service Worker "activated and is running" 확인
+- [ ] 오프라인 모드에서 메모 추가 / 수정 / 삭제 테스트
+- [ ] 온라인 복구 후 데이터 유지 확인
+
+---
+
+## 5단계. 데이터 관리
+
+### 백업 — 메모 내보내기 (Export)
+- [ ] LocalStorage 메모를 JSON 파일로 다운로드
+- [ ] 파일명에 날짜 포함
+
+### 복원 — 메모 가져오기 (Import)
+- [ ] JSON 파일 선택 및 읽기
+- [ ] 기존 데이터 유지하며 추가 (ID 중복 제거)
+- [ ] 성공/실패 토스트 알림
+- [ ] 잘못된 파일 형식 검증
+
+### 이미지 첨부
+- [ ] 이미지 추가 버튼 (갤러리 / 카메라 선택 메뉴)
+- [ ] FileReader로 이미지 → Base64 변환
+- [ ] **이미지 용량 제한: 1장당 최대 500KB** (초과 시 토스트 경고)
+- [ ] **저장 전 LocalStorage 잔여 용량 체크** (부족 시 경고)
+- [ ] 에디터 이미지 미리보기 + 삭제 버튼
+- [ ] LocalStorage에 Base64로 저장 (`images` 배열에 추가)
+- [ ] 상세보기 화면에 첨부 이미지 표시
+
+---
+
+## 6단계. 고급 PWA 기능
+
+### 앱 설치 유도 배너
+- [ ] beforeinstallprompt 이벤트 캐치
+- [ ] 헤더에 설치 버튼 표시 (설치 가능할 때만)
+- [ ] 설치 버튼 클릭 시 설치 프롬프트 실행
+- [ ] 설치 완료 후 버튼 자동 숨김
+
+### 햅틱 피드백 (Vibration API)
+- [ ] 메모 저장 시 진동 1회 (100ms)
+- [ ] 메모 삭제 시 진동 2회 (100-50-100ms)
+
+### 화면 꺼짐 방지 (Screen Wake Lock API)
+- [ ] 입력창 focus 시 Wake Lock ON
+- [ ] 저장 / blur 시 Wake Lock OFF
+- [ ] 앱 백그라운드 복귀 시 Wake Lock 재요청
+
+---
+
+## 7단계. 배포 및 테스트
+
+### Vercel 배포
+- [ ] GitHub 저장소에 최종 코드 푸시
+- [ ] Vercel 프로젝트 생성 및 GitHub 연결
+- [ ] 배포 완료 — URL: (배포 후 작성)
+
+### PWA 설치 테스트
+- [ ] 모바일 브라우저에서 접속
+- [ ] 홈 화면에 추가 및 아이콘 확인
+- [ ] 설치 후 CRUD / 오프라인 / 전체 기능 정상 작동 확인
+
+---
+
+## 8단계. 추가기능 — 폴더 관리
+
+> ℹ️ 메모 데이터 구조에 `folder` 필드가 2단계부터 포함되어 있으므로
+> 이 단계는 UI 구현에만 집중하면 됨. 데이터 마이그레이션 불필요.
+
+### 폴더 자동 생성
+- [ ] 메모 첫 줄이 `폴더명/` 형식이면 `folder` 속성 자동 추출
+- [ ] 같은 폴더명을 가진 메모끼리 자동 그룹화
+- [ ] 폴더명 줄은 메모 목록 미리보기에서 숨김 처리
+
+### 폴더 UI
+- [ ] 메모 목록 상단에 폴더 탭/버튼 목록 자동 생성
+- [ ] "전체" 탭 (기본값) + 폴더별 탭 표시
+- [ ] 폴더 없는 메모는 "미분류"로 표시
+- [ ] 폴더 탭 클릭 시 해당 메모만 필터링
+
+### 폴더 삭제
+- [ ] 폴더 탭 길게 누르면 삭제 옵션 표시
+- [ ] 폴더 삭제 시 메모는 미분류로 이동 (`folder: null` 처리, 메모 삭제 안 함)
+- [ ] 해당 폴더의 모든 메모 일괄 업데이트 (`updatedAt` 갱신)
