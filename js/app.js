@@ -6,6 +6,9 @@ const STORAGE_KEY = 'spark_memos';
 let searchKeyword = '';
 let showStarredOnly = false;
 
+// 폴더 필터 상태 ('__all__' | '__none__' | '폴더명')
+let activeFolder = '__all__';
+
 // 에디터 임시 이미지 (Base64 배열)
 let editorImages = [];
 
@@ -28,9 +31,15 @@ function saveMemos(memos) {
    검색 & 필터 적용
    ============================================= */
 
-// 현재 검색어 + 중요 필터를 적용한 메모 반환
+// 현재 검색어 + 중요 필터 + 폴더 필터를 적용한 메모 반환
 function getFilteredMemos() {
   let memos = getMemos();
+
+  if (activeFolder === '__none__') {
+    memos = memos.filter(m => !m.folder);
+  } else if (activeFolder !== '__all__') {
+    memos = memos.filter(m => m.folder === activeFolder);
+  }
 
   if (showStarredOnly) {
     memos = memos.filter(m => m.starred);
@@ -70,9 +79,11 @@ function renderMemos(memos) {
     li.className = 'memo-item';
     li.dataset.id = memo.id;
 
-    // 첫 줄을 제목으로 사용
+    // 첫 줄을 제목으로 사용 (폴더명 줄이면 다음 줄로 대체)
     const lines = memo.content.split('\n');
-    const title = lines[0] || '(내용 없음)';
+    const firstLine = lines[0] || '';
+    const isFolder = /^.+\/$/.test(firstLine.trimEnd());
+    const title = (isFolder ? lines[1] : firstLine) || '(내용 없음)';
 
     // 날짜 포맷
     const date = new Date(memo.updatedAt);
@@ -115,6 +126,18 @@ function escapeHtml(str) {
 }
 
 /* =============================================
+   폴더 추출
+   ============================================= */
+
+// 첫 줄이 "폴더명/" 형식이면 폴더명 반환, 아니면 null
+function extractFolder(content) {
+  const firstLine = content.split('\n')[0].trimEnd();
+  const match = firstLine.match(/^(.+)\/$/);
+
+  return match ? match[1].trim() : null;
+}
+
+/* =============================================
    Create — 새 메모 생성
    ============================================= */
 
@@ -123,7 +146,7 @@ function createMemo(content, starred, images = []) {
   return {
     id: crypto.randomUUID(),
     content,
-    folder: null,
+    folder: extractFolder(content),
     starred,
     images,
     createdAt: now,
@@ -148,6 +171,7 @@ function deleteMemo(id) {
     exitEditMode();
   }
 
+  renderFolderTabs();
   renderMemos(getFilteredMemos());
 }
 
@@ -402,7 +426,7 @@ function handleSave() {
     // Update: 기존 메모 수정
     memos = memos.map(m => {
       if (m.id !== editingId) return m;
-      return { ...m, content, starred, images: [...editorImages], updatedAt: new Date().toISOString() };
+      return { ...m, content, folder: extractFolder(content), starred, images: [...editorImages], updatedAt: new Date().toISOString() };
     });
   } else {
     // Create: 새 메모 추가
@@ -410,6 +434,7 @@ function handleSave() {
   }
 
   saveMemos(memos);
+  renderFolderTabs();
   renderMemos(getFilteredMemos()); // 현재 필터 상태 유지
 
   vibrateOnSave();
@@ -527,6 +552,101 @@ document.addEventListener('visibilitychange', () => {
     if (document.activeElement === input) requestWakeLock();
   }
 });
+
+/* =============================================
+   폴더 탭 렌더링
+   ============================================= */
+
+function renderFolderTabs() {
+  const memos = getMemos();
+  const section = document.getElementById('folder-tabs');
+  const scroll = document.getElementById('folder-tabs-scroll');
+
+  // 폴더 목록 수집
+  const folderSet = new Set();
+  let hasUnfiled = false;
+  memos.forEach(m => {
+    if (m.folder) folderSet.add(m.folder);
+    else hasUnfiled = true;
+  });
+
+  const folders = [...folderSet].sort();
+
+  // 폴더가 전혀 없으면 탭 영역 숨김
+  if (folders.length === 0 && !hasUnfiled) {
+    section.hidden = true;
+    activeFolder = '__all__';
+    return;
+  }
+
+  section.hidden = false;
+  scroll.innerHTML = '';
+
+  // 전체 탭
+  const allTab = makeTab('전체', '__all__', activeFolder === '__all__');
+  scroll.appendChild(allTab);
+
+  // 폴더별 탭
+  folders.forEach(name => {
+    const tab = makeTab(name, name, activeFolder === name);
+    addLongPress(tab, name);
+    scroll.appendChild(tab);
+  });
+
+  // 미분류 탭 (폴더 없는 메모가 있을 때만)
+  if (hasUnfiled) {
+    const noneTab = makeTab('미분류', '__none__', activeFolder === '__none__');
+    scroll.appendChild(noneTab);
+  }
+}
+
+function makeTab(label, value, isActive) {
+  const btn = document.createElement('button');
+  btn.className = 'folder-tab' + (isActive ? ' is-active' : '');
+  btn.textContent = label;
+  btn.dataset.folder = value;
+  btn.addEventListener('click', () => {
+    activeFolder = value;
+    renderFolderTabs();
+    renderMemos(getFilteredMemos());
+  });
+  return btn;
+}
+
+// 길게 누르기 (폴더 삭제)
+function addLongPress(tab, folderName) {
+  let timer = null;
+
+  const start = () => {
+    timer = setTimeout(() => showFolderDeleteConfirm(folderName), 600);
+  };
+  const cancel = () => clearTimeout(timer);
+
+  tab.addEventListener('touchstart', start, { passive: true });
+  tab.addEventListener('touchend', cancel);
+  tab.addEventListener('touchmove', cancel);
+  tab.addEventListener('mousedown', start);
+  tab.addEventListener('mouseup', cancel);
+  tab.addEventListener('mouseleave', cancel);
+}
+
+function showFolderDeleteConfirm(folderName) {
+  if (!confirm(`"${folderName}" 폴더를 삭제할까요?\n메모는 삭제되지 않고 미분류로 이동합니다.`)) return;
+  deleteFolder(folderName);
+}
+
+function deleteFolder(folderName) {
+  const now = new Date().toISOString();
+  const memos = getMemos().map(m => {
+    if (m.folder !== folderName) return m;
+    return { ...m, folder: null, updatedAt: now };
+  });
+  saveMemos(memos);
+
+  if (activeFolder === folderName) activeFolder = '__all__';
+  renderFolderTabs();
+  renderMemos(getFilteredMemos());
+}
 
 /* =============================================
    다크모드 토글
@@ -688,6 +808,7 @@ function init() {
   applyFontSize(savedSize);
 
   // 저장된 메모 불러와 렌더링
+  renderFolderTabs();
   renderMemos(getMemos());
 
   // 이벤트 바인딩
