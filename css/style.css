@@ -148,7 +148,32 @@ input, textarea {
 
 .header__actions {
   display: flex;
+  align-items: center;
   gap: 4px;
+}
+
+/* 앱 설치 버튼 */
+.btn-install {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--color-header-text);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background-color 0.15s;
+}
+
+.btn-install:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-install svg {
+  width: 15px;
+  height: 15px;
 }
 
 /* =============================================
@@ -351,6 +376,101 @@ input, textarea {
 }
 
 /* =============================================
+   이미지 선택 메뉴
+   ============================================= */
+.image-menu {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--color-input-border);
+}
+
+.image-menu__item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-card-border);
+  font-size: 14px;
+  color: var(--color-text-body);
+  background-color: var(--color-bg);
+  transition: background-color 0.15s;
+}
+
+.image-menu__item:hover {
+  background-color: var(--color-card-border);
+}
+
+.image-menu__item svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* =============================================
+   에디터 이미지 미리보기
+   ============================================= */
+.editor__images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--color-input-border);
+}
+
+.editor__image-item {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.editor__image-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.editor__image-delete {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.editor__image-delete svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* =============================================
+   상세보기 이미지
+   ============================================= */
+.detail-images {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.detail-image {
+  width: 100%;
+  border-radius: var(--radius-md);
+  object-fit: contain;
+  max-height: 300px;
+  background-color: var(--color-bg);
+}
+
+/* =============================================
    검색 & 필터
    ============================================= */
 .search-bar {
@@ -470,12 +590,189 @@ input, textarea {
   fill: var(--color-point);
 }
 
+/* 삭제 버튼 */
+.memo-item__delete {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  opacity: 0;
+  transition: color 0.15s, background-color 0.15s, opacity 0.15s;
+}
+
+.memo-item:hover .memo-item__delete {
+  opacity: 1;
+}
+
+.memo-item__delete:hover {
+  color: #e74c3c;
+  background-color: rgba(231, 76, 60, 0.08);
+}
+
+.memo-item__delete svg {
+  width: 16px;
+  height: 16px;
+}
+
 /* 빈 목록 안내 */
 .memo-empty {
   text-align: center;
   padding: 48px 0;
   color: var(--color-text-muted);
   font-size: 15px;
+}
+
+/* =============================================
+   상세보기 패널
+   ============================================= */
+
+/* 오버레이 배경 */
+.detail-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 300;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.detail-overlay.is-open {
+  opacity: 1;
+}
+
+/* 슬라이드업 패널 */
+.detail-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 640px;
+  margin: 0 auto;
+  background-color: var(--color-card-bg);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  transform: translateY(100%);
+  transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.detail-overlay.is-open .detail-panel {
+  transform: translateY(0);
+}
+
+/* 상세보기 헤더 */
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 12px 12px 8px;
+  border-bottom: 1px solid var(--color-card-border);
+  flex-shrink: 0;
+}
+
+.detail-header__back {
+  color: var(--color-text-body);
+}
+
+.detail-header__date {
+  flex: 1;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.detail-header__actions {
+  display: flex;
+  gap: 2px;
+}
+
+.detail-header__actions .btn-icon {
+  color: var(--color-text-body);
+}
+
+/* 메모 본문 영역 */
+.detail-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 20px 16px;
+}
+
+.detail-content {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--color-text-title);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* 하단 액션 버튼 */
+.detail-footer {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--color-card-border);
+  flex-shrink: 0;
+}
+
+.detail-footer__btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+
+.detail-footer__btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.detail-footer__btn--delete {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: #e74c3c;
+}
+
+.detail-footer__btn--edit {
+  background-color: var(--color-brand);
+  color: #ffffff;
+}
+
+.detail-footer__btn:hover {
+  opacity: 0.85;
+}
+
+/* =============================================
+   복사 완료 토스트
+   ============================================= */
+.copy-toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background-color: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  white-space: nowrap;
+  z-index: 400;
+}
+
+.copy-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 /* =============================================

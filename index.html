@@ -4,6 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SPARK</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#47af5f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="SPARK" />
+  <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -12,6 +18,10 @@
   <header class="header">
     <h1 class="header__logo">SPARK</h1>
     <div class="header__actions">
+      <button class="btn-install" id="btn-install" aria-label="앱 설치" hidden>
+        <i data-lucide="download"></i>
+        설치
+      </button>
       <button class="btn-icon" id="btn-dark-toggle" aria-label="다크모드 전환">
         <i data-lucide="moon"></i>
       </button>
@@ -48,10 +58,23 @@
         rows="6"
       ></textarea>
 
+      <!-- 이미지 미리보기 영역 -->
+      <div class="editor__images" id="editor-images" hidden></div>
+
+      <!-- 이미지 선택 메뉴 -->
+      <div class="image-menu" id="image-menu" hidden>
+        <button class="image-menu__item" id="btn-gallery">
+          <i data-lucide="image"></i> 갤러리
+        </button>
+        <button class="image-menu__item" id="btn-camera-capture">
+          <i data-lucide="camera"></i> 카메라
+        </button>
+      </div>
+
       <!-- 입력 액션 버튼 -->
       <div class="editor__actions">
-        <button class="btn-icon editor__btn" id="btn-camera" aria-label="카메라">
-          <i data-lucide="camera"></i>
+        <button class="btn-icon editor__btn" id="btn-camera" aria-label="이미지 추가">
+          <i data-lucide="image-plus"></i>
         </button>
         <button class="btn-icon editor__btn" id="btn-mic" aria-label="녹음">
           <i data-lucide="mic"></i>
@@ -90,8 +113,52 @@
 
   </main>
 
+  <!-- 상세보기 패널 -->
+  <div class="detail-overlay" id="detail-overlay" hidden>
+    <div class="detail-panel" id="detail-panel">
+      <!-- 상세보기 헤더 -->
+      <div class="detail-header">
+        <button class="btn-icon detail-header__back" id="btn-detail-back" aria-label="뒤로가기">
+          <i data-lucide="arrow-left"></i>
+        </button>
+        <span class="detail-header__date" id="detail-date"></span>
+        <div class="detail-header__actions">
+          <button class="btn-icon" id="btn-detail-share" aria-label="공유">
+            <i data-lucide="share-2"></i>
+          </button>
+          <button class="btn-icon" id="btn-detail-copy" aria-label="복사">
+            <i data-lucide="copy"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 메모 본문 -->
+      <div class="detail-body">
+        <p class="detail-content" id="detail-content"></p>
+        <!-- 첨부 이미지 -->
+        <div class="detail-images" id="detail-images" hidden></div>
+      </div>
+
+      <!-- 하단 액션 버튼 -->
+      <div class="detail-footer">
+        <button class="detail-footer__btn detail-footer__btn--delete" id="btn-detail-delete">
+          <i data-lucide="trash-2"></i>
+          삭제
+        </button>
+        <button class="detail-footer__btn detail-footer__btn--edit" id="btn-detail-edit">
+          <i data-lucide="pencil"></i>
+          수정
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- 파일 가져오기 (숨김) -->
   <input type="file" id="import-input" accept=".json" hidden />
+  <!-- 이미지 선택 — 갤러리 -->
+  <input type="file" id="image-input-gallery" accept="image/*" multiple hidden />
+  <!-- 이미지 선택 — 카메라 -->
+  <input type="file" id="image-input-camera" accept="image/*" capture="environment" hidden />
 
   <!-- lucide 아이콘 -->
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
