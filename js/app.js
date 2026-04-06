@@ -483,9 +483,19 @@ function handleFilterToggle() {
 
 let installPromptEvent = null;
 
+// 이미 설치된 앱인지 확인 (standalone 모드 또는 localStorage 기록)
+function isAppInstalled() {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true ||
+    localStorage.getItem('pwa-installed') === 'true'
+  );
+}
+
 // beforeinstallprompt 이벤트 캐치
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
+  if (isAppInstalled()) return; // 이미 설치된 경우 무시
   installPromptEvent = e;
   document.getElementById('btn-install').hidden = false;
   if (window.lucide) lucide.createIcons();
@@ -495,6 +505,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.addEventListener('appinstalled', () => {
   document.getElementById('btn-install').hidden = true;
   installPromptEvent = null;
+  localStorage.setItem('pwa-installed', 'true');
 });
 
 async function handleInstall() {
@@ -504,6 +515,7 @@ async function handleInstall() {
   if (outcome === 'accepted') {
     installPromptEvent = null;
     document.getElementById('btn-install').hidden = true;
+    localStorage.setItem('pwa-installed', 'true');
   }
 }
 
