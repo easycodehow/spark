@@ -214,21 +214,27 @@ function openDetail(id) {
     imagesEl.hidden = true;
   }
 
-  // 오버레이 표시
-  const overlay = document.getElementById('detail-overlay');
-  overlay.hidden = false;
-  // 애니메이션을 위해 한 프레임 뒤에 클래스 추가
-  requestAnimationFrame(() => overlay.classList.add('is-open'));
+  // 상세보기 페이지 표시 (오른쪽에서 슬라이드인)
+  const page = document.getElementById('page-detail');
+  page.hidden = false;
+  requestAnimationFrame(() => page.classList.add('is-open'));
 
-  // 아이콘 재생성 (동적으로 추가된 lucide 아이콘)
+  // 브라우저/폰 뒤로가기 버튼 지원
+  history.pushState({ detail: id }, '');
+
+  // 스크롤 상단으로
+  document.getElementById('detail-body') && (document.getElementById('detail-body').scrollTop = 0);
+  page.querySelector('.detail-body').scrollTop = 0;
+
+  // 아이콘 재생성
   if (window.lucide) lucide.createIcons();
 }
 
 function closeDetail() {
-  const overlay = document.getElementById('detail-overlay');
-  overlay.classList.remove('is-open');
-  overlay.addEventListener('transitionend', () => {
-    overlay.hidden = true;
+  const page = document.getElementById('page-detail');
+  page.classList.remove('is-open');
+  page.addEventListener('transitionend', () => {
+    page.hidden = true;
     detailMemoId = null;
   }, { once: true });
 }
@@ -240,16 +246,15 @@ function closeDetail() {
 // 수정 버튼: 상세보기 닫고 에디터에 로드
 function handleDetailEdit() {
   const id = detailMemoId;
-  closeDetail();
-  // 패널 닫힘 애니메이션 후 수정 모드 진입
-  setTimeout(() => enterEditMode(id), 200);
+  history.back();
+  setTimeout(() => enterEditMode(id), 300);
 }
 
 // 삭제 버튼
 function handleDetailDelete() {
   const id = detailMemoId;
-  closeDetail();
-  setTimeout(() => deleteMemo(id), 200);
+  history.back();
+  setTimeout(() => deleteMemo(id), 300);
 }
 
 // 공유 버튼 (Web Share API)
@@ -830,15 +835,17 @@ function init() {
   document.getElementById('btn-filter').addEventListener('click', handleFilterToggle);
 
   // 상세보기 버튼
-  document.getElementById('btn-detail-back').addEventListener('click', closeDetail);
+  document.getElementById('btn-detail-back').addEventListener('click', () => {
+    history.back();
+  });
   document.getElementById('btn-detail-edit').addEventListener('click', handleDetailEdit);
   document.getElementById('btn-detail-delete').addEventListener('click', handleDetailDelete);
   document.getElementById('btn-detail-share').addEventListener('click', handleDetailShare);
   document.getElementById('btn-detail-copy').addEventListener('click', handleDetailCopy);
 
-  // 오버레이 배경 클릭 시 닫기
-  document.getElementById('detail-overlay').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('detail-overlay')) closeDetail();
+  // 브라우저/폰 뒤로가기 버튼 처리
+  window.addEventListener('popstate', () => {
+    if (detailMemoId) closeDetail();
   });
 
   // 앱 설치 버튼

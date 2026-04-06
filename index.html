@@ -14,151 +14,156 @@
 </head>
 <body>
 
-  <!-- 헤더 -->
-  <header class="header">
-    <h1 class="header__logo">SPARK</h1>
-    <div class="header__actions">
-      <button class="btn-install" id="btn-install" aria-label="앱 설치" hidden>
-        <i data-lucide="download"></i>
-        설치
-      </button>
-      <button class="btn-icon" id="btn-dark-toggle" aria-label="다크모드 전환">
-        <i data-lucide="moon"></i>
-      </button>
-      <button class="btn-icon" id="btn-more" aria-label="더보기">
-        <i data-lucide="ellipsis-vertical"></i>
-      </button>
-    </div>
-  </header>
+  <!-- 목록 페이지 -->
+  <div class="page" id="page-list">
 
-  <!-- 더보기 메뉴 -->
-  <div class="more-menu" id="more-menu" hidden>
-    <ul class="more-menu__list">
-      <li><button class="more-menu__item" id="btn-export">메모 내보내기</button></li>
-      <li><button class="more-menu__item" id="btn-import-trigger">메모 가져오기</button></li>
-      <li>
-        <span class="more-menu__label">글자크기</span>
-        <div class="font-size-controls">
-          <button class="btn-font-size" data-size="small">작게</button>
-          <button class="btn-font-size active" data-size="medium">보통</button>
-          <button class="btn-font-size" data-size="large">크게</button>
-        </div>
-      </li>
-    </ul>
-  </div>
-
-  <main class="main">
-
-    <!-- 메모 입력 영역 -->
-    <section class="editor">
-      <textarea
-        class="editor__textarea"
-        id="memo-input"
-        placeholder="메모를 입력하세요..."
-        rows="6"
-      ></textarea>
-
-      <!-- 이미지 미리보기 영역 -->
-      <div class="editor__images" id="editor-images" hidden></div>
-
-      <!-- 이미지 선택 메뉴 -->
-      <div class="image-menu" id="image-menu" hidden>
-        <button class="image-menu__item" id="btn-gallery">
-          <i data-lucide="image"></i> 갤러리
+    <!-- 헤더 -->
+    <header class="header">
+      <h1 class="header__logo">SPARK</h1>
+      <div class="header__actions">
+        <button class="btn-install" id="btn-install" aria-label="앱 설치" hidden>
+          <i data-lucide="download"></i>
+          설치
         </button>
-        <button class="image-menu__item" id="btn-camera-capture">
-          <i data-lucide="camera"></i> 카메라
+        <button class="btn-icon" id="btn-dark-toggle" aria-label="다크모드 전환">
+          <i data-lucide="moon"></i>
+        </button>
+        <button class="btn-icon" id="btn-more" aria-label="더보기">
+          <i data-lucide="ellipsis-vertical"></i>
         </button>
       </div>
+    </header>
 
-      <!-- 입력 액션 버튼 -->
-      <div class="editor__actions">
-        <button class="btn-icon editor__btn" id="btn-camera" aria-label="이미지 추가">
-          <i data-lucide="image-plus"></i>
-        </button>
-        <button class="btn-icon editor__btn" id="btn-mic" aria-label="녹음">
-          <i data-lucide="mic"></i>
-        </button>
-        <button class="btn-icon editor__btn btn-star" id="btn-star" aria-label="중요 메모" data-starred="false">
-          <i data-lucide="star"></i>
-          <span>중요</span>
-        </button>
-        <button class="btn-save" id="btn-save">저장</button>
-      </div>
-    </section>
-
-    <!-- 폴더 탭 -->
-    <section class="folder-tabs" id="folder-tabs" hidden>
-      <div class="folder-tabs__scroll" id="folder-tabs-scroll">
-        <!-- 탭은 JS로 렌더링 -->
-      </div>
-    </section>
-
-    <!-- 검색 & 필터 -->
-    <section class="search-bar">
-      <div class="search-bar__input-wrap">
-        <i data-lucide="search" class="search-bar__icon"></i>
-        <input
-          type="text"
-          class="search-bar__input"
-          id="search-input"
-          placeholder="메모 검색"
-        />
-      </div>
-      <button class="btn-icon btn-filter" id="btn-filter" aria-label="중요 메모 필터" data-active="false">
-        <i data-lucide="star"></i>
-      </button>
-    </section>
-
-    <!-- 메모 목록 -->
-    <section class="memo-list-section">
-      <ul class="memo-list" id="memo-list">
-        <!-- 메모 아이템은 JS로 렌더링 -->
+    <!-- 더보기 메뉴 -->
+    <div class="more-menu" id="more-menu" hidden>
+      <ul class="more-menu__list">
+        <li><button class="more-menu__item" id="btn-export">메모 내보내기</button></li>
+        <li><button class="more-menu__item" id="btn-import-trigger">메모 가져오기</button></li>
+        <li>
+          <span class="more-menu__label">글자크기</span>
+          <div class="font-size-controls">
+            <button class="btn-font-size" data-size="small">작게</button>
+            <button class="btn-font-size active" data-size="medium">보통</button>
+            <button class="btn-font-size" data-size="large">크게</button>
+          </div>
+        </li>
       </ul>
-      <p class="memo-empty" id="memo-empty" hidden>메모가 없습니다.</p>
-    </section>
+    </div>
 
-  </main>
+    <main class="main">
 
-  <!-- 상세보기 패널 -->
-  <div class="detail-overlay" id="detail-overlay" hidden>
-    <div class="detail-panel" id="detail-panel">
-      <!-- 상세보기 헤더 -->
-      <div class="detail-header">
-        <button class="btn-icon detail-header__back" id="btn-detail-back" aria-label="뒤로가기">
-          <i data-lucide="arrow-left"></i>
-        </button>
-        <span class="detail-header__date" id="detail-date"></span>
-        <div class="detail-header__actions">
-          <button class="btn-icon" id="btn-detail-share" aria-label="공유">
-            <i data-lucide="share-2"></i>
+      <!-- 메모 입력 영역 -->
+      <section class="editor">
+        <textarea
+          class="editor__textarea"
+          id="memo-input"
+          placeholder="메모를 입력하세요..."
+          rows="6"
+        ></textarea>
+
+        <!-- 이미지 미리보기 영역 -->
+        <div class="editor__images" id="editor-images" hidden></div>
+
+        <!-- 이미지 선택 메뉴 -->
+        <div class="image-menu" id="image-menu" hidden>
+          <button class="image-menu__item" id="btn-gallery">
+            <i data-lucide="image"></i> 갤러리
           </button>
-          <button class="btn-icon" id="btn-detail-copy" aria-label="복사">
-            <i data-lucide="copy"></i>
+          <button class="image-menu__item" id="btn-camera-capture">
+            <i data-lucide="camera"></i> 카메라
           </button>
         </div>
-      </div>
 
-      <!-- 메모 본문 -->
-      <div class="detail-body">
-        <p class="detail-content" id="detail-content"></p>
-        <!-- 첨부 이미지 -->
-        <div class="detail-images" id="detail-images" hidden></div>
-      </div>
+        <!-- 입력 액션 버튼 -->
+        <div class="editor__actions">
+          <button class="btn-icon editor__btn" id="btn-camera" aria-label="이미지 추가">
+            <i data-lucide="image-plus"></i>
+          </button>
+          <button class="btn-icon editor__btn" id="btn-mic" aria-label="녹음">
+            <i data-lucide="mic"></i>
+          </button>
+          <button class="btn-icon editor__btn btn-star" id="btn-star" aria-label="중요 메모" data-starred="false">
+            <i data-lucide="star"></i>
+            <span>중요</span>
+          </button>
+          <button class="btn-save" id="btn-save">저장</button>
+        </div>
+      </section>
 
-      <!-- 하단 액션 버튼 -->
-      <div class="detail-footer">
-        <button class="detail-footer__btn detail-footer__btn--delete" id="btn-detail-delete">
-          <i data-lucide="trash-2"></i>
-          삭제
+      <!-- 폴더 탭 -->
+      <section class="folder-tabs" id="folder-tabs" hidden>
+        <div class="folder-tabs__scroll" id="folder-tabs-scroll">
+          <!-- 탭은 JS로 렌더링 -->
+        </div>
+      </section>
+
+      <!-- 검색 & 필터 -->
+      <section class="search-bar">
+        <div class="search-bar__input-wrap">
+          <i data-lucide="search" class="search-bar__icon"></i>
+          <input
+            type="text"
+            class="search-bar__input"
+            id="search-input"
+            placeholder="메모 검색"
+          />
+        </div>
+        <button class="btn-icon btn-filter" id="btn-filter" aria-label="중요 메모 필터" data-active="false">
+          <i data-lucide="star"></i>
         </button>
-        <button class="detail-footer__btn detail-footer__btn--edit" id="btn-detail-edit">
-          <i data-lucide="pencil"></i>
-          수정
+      </section>
+
+      <!-- 메모 목록 -->
+      <section class="memo-list-section">
+        <ul class="memo-list" id="memo-list">
+          <!-- 메모 아이템은 JS로 렌더링 -->
+        </ul>
+        <p class="memo-empty" id="memo-empty" hidden>메모가 없습니다.</p>
+      </section>
+
+    </main>
+
+  </div><!-- /page-list -->
+
+  <!-- 상세보기 페이지 -->
+  <div class="page page--detail" id="page-detail" hidden>
+
+    <!-- 상세보기 헤더 -->
+    <header class="detail-header">
+      <button class="btn-icon detail-header__back" id="btn-detail-back" aria-label="뒤로가기">
+        <i data-lucide="arrow-left"></i>
+      </button>
+      <span class="detail-header__date" id="detail-date"></span>
+      <div class="detail-header__actions">
+        <button class="btn-icon" id="btn-detail-share" aria-label="공유">
+          <i data-lucide="share-2"></i>
+        </button>
+        <button class="btn-icon" id="btn-detail-copy" aria-label="복사">
+          <i data-lucide="copy"></i>
         </button>
       </div>
+    </header>
+
+    <!-- 메모 본문 -->
+    <div class="detail-body">
+      <p class="detail-content" id="detail-content"></p>
+      <!-- 첨부 이미지 -->
+      <div class="detail-images" id="detail-images" hidden></div>
     </div>
-  </div>
+
+    <!-- 하단 액션 버튼 -->
+    <div class="detail-footer">
+      <button class="detail-footer__btn detail-footer__btn--delete" id="btn-detail-delete">
+        <i data-lucide="trash-2"></i>
+        삭제
+      </button>
+      <button class="detail-footer__btn detail-footer__btn--edit" id="btn-detail-edit">
+        <i data-lucide="pencil"></i>
+        수정
+      </button>
+    </div>
+
+  </div><!-- /page-detail -->
 
   <!-- 파일 가져오기 (숨김) -->
   <input type="file" id="import-input" accept=".json" hidden />
