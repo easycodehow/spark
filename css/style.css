@@ -677,6 +677,7 @@ input, textarea {
   position: fixed;
   inset: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   background-color: var(--color-bg);
   transition: background-color 0.2s, color 0.2s;
 }

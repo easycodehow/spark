@@ -217,7 +217,10 @@ function openDetail(id) {
   // 상세보기 페이지 표시 (오른쪽에서 슬라이드인)
   const page = document.getElementById('page-detail');
   page.hidden = false;
-  requestAnimationFrame(() => page.classList.add('is-open'));
+  // 브라우저가 초기 위치(translateX 100%)를 먼저 렌더링하도록 더블 RAF 사용
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => page.classList.add('is-open'));
+  });
 
   // 브라우저/폰 뒤로가기 버튼 지원
   history.pushState({ detail: id }, '');
@@ -515,11 +518,13 @@ window.addEventListener('appinstalled', () => {
 
 async function handleInstall() {
   if (!installPromptEvent) return;
-  installPromptEvent.prompt();
-  const { outcome } = await installPromptEvent.userChoice;
+  // 프롬프트는 1회만 사용 가능하므로 클릭 즉시 버튼 숨김
+  const evt = installPromptEvent;
+  installPromptEvent = null;
+  document.getElementById('btn-install').hidden = true;
+  evt.prompt();
+  const { outcome } = await evt.userChoice;
   if (outcome === 'accepted') {
-    installPromptEvent = null;
-    document.getElementById('btn-install').hidden = true;
     localStorage.setItem('pwa-installed', 'true');
   }
 }
