@@ -1,6 +1,6 @@
 // Service Worker — SPARK 메모앱
 
-const CACHE_NAME = 'spark-v3';
+const CACHE_NAME = 'spark-v4';
 
 // 오프라인에서도 동작할 파일 목록
 const CACHE_FILES = [
