@@ -518,15 +518,13 @@ window.addEventListener('appinstalled', () => {
 
 async function handleInstall() {
   if (!installPromptEvent) return;
-  // 프롬프트는 1회만 사용 가능하므로 클릭 즉시 버튼 숨김
+  // 프롬프트는 1회만 사용 가능하므로 클릭 즉시 버튼 숨김 + 플래그 설정
   const evt = installPromptEvent;
   installPromptEvent = null;
   document.getElementById('btn-install').hidden = true;
+  localStorage.setItem('pwa-installed', 'true');
   evt.prompt();
-  const { outcome } = await evt.userChoice;
-  if (outcome === 'accepted') {
-    localStorage.setItem('pwa-installed', 'true');
-  }
+  await evt.userChoice;
 }
 
 /* =============================================
@@ -821,6 +819,12 @@ function showToast(message, isError = false) {
    ============================================= */
 
 function init() {
+  // standalone 모드로 실행 중이면 설치 완료로 간주
+  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+    localStorage.setItem('pwa-installed', 'true');
+    document.getElementById('btn-install').hidden = true;
+  }
+
   // 저장된 테마 적용
   const savedTheme = localStorage.getItem(THEME_KEY);
   applyTheme(savedTheme === 'dark');
