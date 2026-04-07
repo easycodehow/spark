@@ -214,13 +214,9 @@ function openDetail(id) {
     imagesEl.hidden = true;
   }
 
-  // 상세보기 페이지 표시 (오른쪽에서 슬라이드인)
+  // 상세보기 페이지 표시
   const page = document.getElementById('page-detail');
-  page.hidden = false;
-  // 브라우저가 초기 위치(translateX 100%)를 먼저 렌더링하도록 더블 RAF 사용
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => page.classList.add('is-open'));
-  });
+  page.classList.add('is-open');
 
   // 브라우저/폰 뒤로가기 버튼 지원
   history.pushState({ detail: id }, '');
@@ -236,10 +232,7 @@ function openDetail(id) {
 function closeDetail() {
   const page = document.getElementById('page-detail');
   page.classList.remove('is-open');
-  page.addEventListener('transitionend', () => {
-    page.hidden = true;
-    detailMemoId = null;
-  }, { once: true });
+  detailMemoId = null;
 }
 
 /* =============================================

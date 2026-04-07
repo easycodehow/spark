@@ -682,16 +682,14 @@ input, textarea {
   transition: background-color 0.2s, color 0.2s;
 }
 
-/* 상세보기 페이지 — 오른쪽에서 슬라이드인 */
+/* 상세보기 페이지 */
 .page--detail {
-  transform: translateX(100%);
-  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-  display: flex;
+  display: none;
   flex-direction: column;
 }
 
 .page--detail.is-open {
-  transform: translateX(0);
+  display: flex;
 }
 
 /* =============================================
