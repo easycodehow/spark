@@ -133,34 +133,36 @@
       <button class="btn-icon detail-header__back" id="btn-detail-back" aria-label="뒤로가기">
         <i data-lucide="arrow-left"></i>
       </button>
-      <span class="detail-header__date" id="detail-date"></span>
-      <div class="detail-header__actions">
-        <button class="btn-icon" id="btn-detail-share" aria-label="공유">
-          <i data-lucide="share-2"></i>
-        </button>
-        <button class="btn-icon" id="btn-detail-copy" aria-label="복사">
-          <i data-lucide="copy"></i>
-        </button>
-      </div>
     </header>
 
-    <!-- 메모 본문 -->
+    <!-- 메모 카드 -->
     <div class="detail-body">
-      <p class="detail-content" id="detail-content"></p>
-      <!-- 첨부 이미지 -->
-      <div class="detail-images" id="detail-images" hidden></div>
-    </div>
+      <div class="detail-card">
+        <p class="detail-content" id="detail-content"></p>
+        <!-- 첨부 이미지 -->
+        <div class="detail-images" id="detail-images" hidden></div>
+        <p class="detail-card__date" id="detail-date"></p>
+      </div>
 
-    <!-- 하단 액션 버튼 -->
-    <div class="detail-footer">
-      <button class="detail-footer__btn detail-footer__btn--delete" id="btn-detail-delete">
-        <i data-lucide="trash-2"></i>
-        삭제
-      </button>
-      <button class="detail-footer__btn detail-footer__btn--edit" id="btn-detail-edit">
-        <i data-lucide="pencil"></i>
-        수정
-      </button>
+      <!-- 액션 버튼 -->
+      <div class="detail-actions">
+        <button class="detail-action-btn detail-action-btn--edit" id="btn-detail-edit">
+          <i data-lucide="pencil"></i>
+          수정
+        </button>
+        <button class="detail-action-btn detail-action-btn--share" id="btn-detail-share">
+          <i data-lucide="share-2"></i>
+          공유
+        </button>
+        <button class="detail-action-btn detail-action-btn--copy" id="btn-detail-copy">
+          <i data-lucide="copy"></i>
+          복사
+        </button>
+        <button class="detail-action-btn detail-action-btn--delete" id="btn-detail-delete">
+          <i data-lucide="trash-2"></i>
+          삭제
+        </button>
+      </div>
     </div>
 
   </div><!-- /page-detail -->
