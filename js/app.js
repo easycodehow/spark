@@ -496,7 +496,11 @@ function isAppInstalled() {
 // beforeinstallprompt 이벤트 캐치
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
-  if (isAppInstalled()) return; // 이미 설치된 경우 무시
+  if (isAppInstalled()) {
+    // 설치 완료 상태이므로 버튼 강제 숨김
+    document.getElementById('btn-install').hidden = true;
+    return;
+  }
   installPromptEvent = e;
   document.getElementById('btn-install').hidden = false;
   if (window.lucide) lucide.createIcons();
@@ -812,8 +816,8 @@ function showToast(message, isError = false) {
    ============================================= */
 
 function init() {
-  // standalone 모드로 실행 중이면 설치 완료로 간주
-  if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+  // 설치 여부 확인 — standalone 모드이거나 localStorage 기록이 있으면 버튼 숨김
+  if (isAppInstalled()) {
     localStorage.setItem('pwa-installed', 'true');
     document.getElementById('btn-install').hidden = true;
   }
