@@ -330,8 +330,6 @@ function exitEditMode() {
    이미지 첨부
    ============================================= */
 
-const IMAGE_MAX_BYTES = 500 * 1024; // 500KB
-
 // 이미지 선택 메뉴 토글
 function toggleImageMenu(e) {
   e.stopPropagation();
@@ -383,19 +381,42 @@ function checkStorageCapacity(additionalBytes) {
   }
 }
 
-// FileList를 받아 Base64로 변환 후 editorImages에 추가
-function processImageFiles(files) {
-  Array.from(files).forEach(file => {
-    if (file.size > IMAGE_MAX_BYTES) {
-      showToast(`${file.name}: 500KB를 초과한 이미지는 첨부할 수 없습니다`, true);
-      return;
-    }
+// 이미지를 Canvas로 압축 후 Base64 반환 (긴 쪽 최대 1200px, JPEG 품질 0.8)
+function compressImage(file) {
+  return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (e) => {
-      editorImages.push(e.target.result);
-      renderEditorImages();
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 1200;
+        let { width, height } = img;
+        if (width > MAX || height > MAX) {
+          if (width >= height) {
+            height = Math.round(height * MAX / width);
+            width = MAX;
+          } else {
+            width = Math.round(width * MAX / height);
+            height = MAX;
+          }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.src = e.target.result;
     };
     reader.readAsDataURL(file);
+  });
+}
+
+// FileList를 받아 압축 후 editorImages에 추가
+function processImageFiles(files) {
+  Array.from(files).forEach(async (file) => {
+    const base64 = await compressImage(file);
+    editorImages.push(base64);
+    renderEditorImages();
   });
 }
 
