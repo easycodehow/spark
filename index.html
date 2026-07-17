@@ -7,7 +7,7 @@
 
   <!-- PWA -->
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#FF6FB0" />
+  <meta name="theme-color" content="#22242E" />
   <link rel="icon" href="icons/icon-192x192.png" />
   <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
 
@@ -17,10 +17,31 @@
 <body>
   <!-- 헤더 -->
   <header id="app-header">
+    <h1 class="logo">SPARK</h1>
   </header>
 
   <!-- 메모 입력/목록 영역 -->
   <main id="app-main">
+    <!-- 메모 입력 영역 -->
+    <section class="memo-editor">
+      <textarea id="memo-input" placeholder="메모를 입력하세요..." rows="6"></textarea>
+      <div class="editor-actions">
+        <button id="star-toggle" class="icon-btn" type="button" aria-label="중요 메모로 표시" aria-pressed="false">★</button>
+        <button id="save-btn" class="primary-btn" type="button">저장</button>
+      </div>
+    </section>
+
+    <!-- 검색 & 필터 -->
+    <section class="memo-toolbar">
+      <input type="text" id="search-input" placeholder="메모 검색" />
+      <button id="filter-toggle" class="icon-btn" type="button" aria-label="중요 메모만 보기" aria-pressed="false">★</button>
+    </section>
+
+    <!-- 메모 목록 -->
+    <section class="memo-list-section">
+      <ul id="memo-list"></ul>
+      <p id="empty-message" class="empty-message">저장된 메모가 없습니다.</p>
+    </section>
   </main>
 
   <!-- 푸터 -->

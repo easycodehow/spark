@@ -3,22 +3,22 @@
    ========================================================================== */
 :root {
   /* Brand Colors */
-  --color-brand: #FF6FB0;
-  --color-point: #FF8FAB;
+  --color-brand: #22242E;
+  --color-point: #FF6FB0;
 
   /* Light Mode */
-  --color-bg: #FFF5F8;
-  --color-text-title: #3D2C35;
-  --color-text-body: #6E5A63;
-  --color-text-muted: #B39AA3;
+  --color-bg: #FDF6E7;
+  --color-text-title: #22242E;
+  --color-text-body: #514F5C;
+  --color-text-muted: #BFB5A3;
 }
 
 [data-theme="dark"] {
-  --color-header-dark: #2A1420;
-  --color-bg-dark: #191113;
-  --color-text-title-dark: #F5E8ED;
-  --color-text-body-dark: #C8B2BC;
-  --color-text-muted-dark: #7A5A67;
+  --color-header-dark: #15161D;
+  --color-bg-dark: #101014;
+  --color-text-title-dark: #F3DFA0;
+  --color-text-body-dark: #C7BFA8;
+  --color-text-muted-dark: #6E6A5C;
   --color-point-dark: #FFB3C8;
 }
 
@@ -46,12 +46,277 @@ body {
    헤더
    ========================================================================== */
 #app-header {
+  display: flex;
+  align-items: center;
+  padding: 16px 20px;
+  background-color: var(--color-bg);
+}
+
+[data-theme="dark"] #app-header {
+  background-color: var(--color-bg-dark);
+}
+
+.logo {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--color-brand);
+  letter-spacing: 0.5px;
+}
+
+[data-theme="dark"] .logo {
+  color: var(--color-text-title-dark);
 }
 
 /* ==========================================================================
    메인 (메모 입력 / 목록)
    ========================================================================== */
 #app-main {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* 메모 입력 영역 */
+.memo-editor {
+  background-color: #FFFFFF;
+  border: 1px solid rgba(192, 57, 43, 0.4);
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+[data-theme="dark"] .memo-editor {
+  background-color: var(--color-header-dark);
+}
+
+#memo-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--color-text-title);
+  background: transparent;
+}
+
+#memo-input::placeholder {
+  color: var(--color-text-muted);
+  font-size: 18px;
+}
+
+[data-theme="dark"] #memo-input {
+  color: var(--color-text-title-dark);
+}
+
+[data-theme="dark"] #memo-input::placeholder {
+  color: var(--color-text-muted-dark);
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  font-size: 24px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 8px;
+  line-height: 1;
+}
+
+.icon-btn[aria-pressed="true"] {
+  color: var(--color-point);
+}
+
+[data-theme="dark"] .icon-btn {
+  color: var(--color-text-muted-dark);
+}
+
+[data-theme="dark"] .icon-btn[aria-pressed="true"] {
+  color: var(--color-point-dark);
+}
+
+#star-toggle,
+#filter-toggle {
+  border: 1.5px solid var(--color-point);
+  color: var(--color-point);
+  font-size: 20px;
+  height: 44px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#star-toggle[aria-pressed="true"],
+#filter-toggle[aria-pressed="true"] {
+  background-color: var(--color-point);
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] #star-toggle,
+[data-theme="dark"] #filter-toggle {
+  border-color: var(--color-point-dark);
+  color: var(--color-point-dark);
+}
+
+[data-theme="dark"] #star-toggle[aria-pressed="true"],
+[data-theme="dark"] #filter-toggle[aria-pressed="true"] {
+  background-color: var(--color-point-dark);
+  color: var(--color-header-dark);
+}
+
+.primary-btn {
+  border: none;
+  background-color: var(--color-point);
+  color: #FFFFFF;
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  height: 44px;
+  padding: 0 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+[data-theme="dark"] .primary-btn {
+  background-color: var(--color-point-dark);
+}
+
+/* 검색 & 필터 */
+.memo-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+#search-input {
+  flex: 1;
+  border: 1px solid rgba(192, 57, 43, 0.4);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 17px;
+  font-family: inherit;
+  color: var(--color-text-title);
+  background-color: #FFFFFF;
+}
+
+[data-theme="dark"] #search-input {
+  background-color: var(--color-header-dark);
+  color: var(--color-text-title-dark);
+}
+
+#search-input::placeholder {
+  color: var(--color-text-muted);
+  font-size: 18px;
+}
+
+[data-theme="dark"] #search-input::placeholder {
+  color: var(--color-text-muted-dark);
+}
+
+/* 메모 목록 */
+.memo-list-section {
+  display: flex;
+  flex-direction: column;
+}
+
+#memo-list {
+  list-style: none;
+}
+
+.memo-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 14px 4px;
+  border-bottom: 1px solid rgba(191, 181, 163, 0.3);
+  cursor: pointer;
+}
+
+.memo-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.memo-item-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-text-title);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-theme="dark"] .memo-item-title {
+  color: var(--color-text-title-dark);
+}
+
+.memo-item-date {
+  font-size: 14px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+[data-theme="dark"] .memo-item-date {
+  color: var(--color-text-muted-dark);
+}
+
+.memo-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.memo-star-btn {
+  border: none;
+  background: transparent;
+  font-size: 19px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.memo-star-btn.active {
+  color: var(--color-point);
+}
+
+[data-theme="dark"] .memo-star-btn.active {
+  color: var(--color-point-dark);
+}
+
+.memo-delete-btn {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.empty-message {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 18px;
+  padding: 32px 0;
+}
+
+[data-theme="dark"] .empty-message {
+  color: var(--color-text-muted-dark);
 }
 
 /* ==========================================================================
