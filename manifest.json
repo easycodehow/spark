@@ -1,0 +1,21 @@
+{
+  "name": "spark",
+  "short_name": "spark",
+  "description": "오프라인 메모장 애플리케이션",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF5F8",
+  "theme_color": "#FF6FB0",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

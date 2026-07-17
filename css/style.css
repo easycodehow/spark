@@ -1,0 +1,61 @@
+/* ==========================================================================
+   CSS 변수 - 컬러 시스템
+   ========================================================================== */
+:root {
+  /* Brand Colors */
+  --color-brand: #FF6FB0;
+  --color-point: #FF8FAB;
+
+  /* Light Mode */
+  --color-bg: #FFF5F8;
+  --color-text-title: #3D2C35;
+  --color-text-body: #6E5A63;
+  --color-text-muted: #B39AA3;
+}
+
+[data-theme="dark"] {
+  --color-header-dark: #2A1420;
+  --color-bg-dark: #191113;
+  --color-text-title-dark: #F5E8ED;
+  --color-text-body-dark: #C8B2BC;
+  --color-text-muted-dark: #7A5A67;
+  --color-point-dark: #FFB3C8;
+}
+
+/* ==========================================================================
+   기본 리셋
+   ========================================================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text-body);
+}
+
+[data-theme="dark"] body {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-body-dark);
+}
+
+/* ==========================================================================
+   헤더
+   ========================================================================== */
+#app-header {
+}
+
+/* ==========================================================================
+   메인 (메모 입력 / 목록)
+   ========================================================================== */
+#app-main {
+}
+
+/* ==========================================================================
+   푸터
+   ========================================================================== */
+#app-footer {
+}
