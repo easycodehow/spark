@@ -26,14 +26,15 @@
    글자크기 배율 (더보기 메뉴 > 글자크기, 5단계)
    ========================================================================== */
 :root {
-  --font-scale: 1;
+  --font-scale: 1.125;
 }
 
-[data-font-size="xs"] { --font-scale: 0.8125; }
-[data-font-size="s"]  { --font-scale: 0.9375; }
-[data-font-size="m"]  { --font-scale: 1; }
-[data-font-size="l"]  { --font-scale: 1.125; }
-[data-font-size="xl"] { --font-scale: 1.25; }
+/* 본문(16px 기준) 텍스트가 각 단계에서 14 / 16 / 18 / 20 / 24px가 되도록 배율 산정 */
+[data-font-size="xs"] { --font-scale: 0.875; }
+[data-font-size="s"]  { --font-scale: 1; }
+[data-font-size="m"]  { --font-scale: 1.125; }
+[data-font-size="l"]  { --font-scale: 1.25; }
+[data-font-size="xl"] { --font-scale: 1.5; }
 
 /* ==========================================================================
    기본 리셋
