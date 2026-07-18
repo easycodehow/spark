@@ -3,6 +3,8 @@
 const STORAGE_KEY = 'spark-memos';
 const FONT_SIZE_KEY = 'spark-font-size';
 const FONT_SIZES = ['xs', 's', 'm', 'l', 'xl'];
+const THEME_KEY = 'spark-theme';
+const THEME_COLOR = { light: '#1E3A5F', dark: '#101014' };
 
 let editingId = null;
 let showStarredOnly = false;
@@ -25,6 +27,8 @@ const toastEl = document.getElementById('toast');
 const fontSizeDecreaseBtn = document.getElementById('fontsize-decrease');
 const fontSizeIncreaseBtn = document.getElementById('fontsize-increase');
 const fontSizeDots = document.querySelectorAll('.fontsize-dot');
+const darkModeBtn = document.getElementById('dark-mode-btn');
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 
 const memoEditorSection = document.querySelector('.memo-editor');
 const memoToolbar = document.querySelector('.memo-toolbar');
@@ -393,6 +397,26 @@ fontSizeDecreaseBtn.addEventListener('click', () => stepFontSize(-1));
 fontSizeIncreaseBtn.addEventListener('click', () => stepFontSize(1));
 
 loadFontSize();
+
+// ===== 다크모드 토글 =====
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  darkModeBtn.setAttribute('aria-pressed', String(theme === 'dark'));
+  themeColorMeta.setAttribute('content', THEME_COLOR[theme]);
+}
+
+function loadTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  applyTheme(saved === 'dark' ? 'dark' : 'light');
+}
+
+darkModeBtn.addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  localStorage.setItem(THEME_KEY, next);
+});
+
+loadTheme();
 
 detailBackBtn.addEventListener('click', closeDetail);
 
