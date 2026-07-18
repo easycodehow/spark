@@ -18,6 +18,15 @@
   <!-- 헤더 -->
   <header id="app-header">
     <h1 class="logo">SPARK</h1>
+    <button id="more-menu-toggle" class="more-menu-toggle" type="button" aria-label="더보기 메뉴" aria-expanded="false">⋮</button>
+
+    <!-- 더보기 메뉴 -->
+    <div id="more-menu" class="more-menu" hidden>
+      <button id="export-btn" class="more-menu-item" type="button">메모 내보내기</button>
+      <button id="import-btn" class="more-menu-item" type="button">메모 가져오기</button>
+      <button id="font-size-btn" class="more-menu-item" type="button">글자크기 조절</button>
+      <button id="dark-mode-btn" class="more-menu-item" type="button">다크모드</button>
+    </div>
   </header>
 
   <!-- 메모 입력/목록 영역 -->

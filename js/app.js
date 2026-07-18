@@ -14,6 +14,9 @@ const filterToggle = document.getElementById('filter-toggle');
 const memoList = document.getElementById('memo-list');
 const emptyMessage = document.getElementById('empty-message');
 
+const moreMenuToggle = document.getElementById('more-menu-toggle');
+const moreMenu = document.getElementById('more-menu');
+
 const memoEditorSection = document.querySelector('.memo-editor');
 const memoToolbar = document.querySelector('.memo-toolbar');
 const memoListSection = document.querySelector('.memo-list-section');
@@ -220,6 +223,29 @@ filterToggle.addEventListener('click', () => {
   showStarredOnly = !showStarredOnly;
   filterToggle.setAttribute('aria-pressed', String(showStarredOnly));
   renderList();
+});
+
+// ===== 더보기 메뉴 =====
+function closeMoreMenu() {
+  moreMenu.hidden = true;
+  moreMenuToggle.setAttribute('aria-expanded', 'false');
+}
+
+moreMenuToggle.addEventListener('click', (event) => {
+  event.stopPropagation();
+  const isOpen = !moreMenu.hidden;
+  if (isOpen) {
+    closeMoreMenu();
+  } else {
+    moreMenu.hidden = false;
+    moreMenuToggle.setAttribute('aria-expanded', 'true');
+  }
+});
+
+document.addEventListener('click', (event) => {
+  if (moreMenu.hidden) return;
+  if (moreMenu.contains(event.target) || event.target === moreMenuToggle) return;
+  closeMoreMenu();
 });
 
 detailBackBtn.addEventListener('click', closeDetail);
