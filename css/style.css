@@ -35,6 +35,19 @@
   display: none !important;
 }
 
+/* display:none 대신 시각적으로만 숨김 (일부 모바일 브라우저의 file input .click() 제약 우회용) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 body {
   font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
   background-color: var(--color-bg);
@@ -469,4 +482,35 @@ body {
    푸터
    ========================================================================== */
 #app-footer {
+}
+
+/* ==========================================================================
+   토스트 알림
+   ========================================================================== */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%) translateY(8px);
+  max-width: calc(100% - 40px);
+  background-color: var(--color-text-title);
+  color: var(--color-bg);
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 100;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+[data-theme="dark"] .toast {
+  background-color: var(--color-text-title-dark);
+  color: var(--color-bg-dark);
 }

@@ -17,6 +17,9 @@ const emptyMessage = document.getElementById('empty-message');
 const moreMenuToggle = document.getElementById('more-menu-toggle');
 const moreMenu = document.getElementById('more-menu');
 const exportBtn = document.getElementById('export-btn');
+const importBtn = document.getElementById('import-btn');
+const importFileInput = document.getElementById('import-file-input');
+const toastEl = document.getElementById('toast');
 
 const memoEditorSection = document.querySelector('.memo-editor');
 const memoToolbar = document.querySelector('.memo-toolbar');
@@ -273,6 +276,86 @@ function exportMemos() {
 exportBtn.addEventListener('click', () => {
   exportMemos();
   closeMoreMenu();
+});
+
+// ===== 토스트 알림 =====
+let toastTimer = null;
+function showToast(message) {
+  toastEl.textContent = message;
+  toastEl.hidden = false;
+  // 리플로우를 강제해 매번 fade-in 트랜지션이 재생되도록 함
+  void toastEl.offsetWidth;
+  toastEl.classList.add('show');
+
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toastEl.classList.remove('show');
+    setTimeout(() => {
+      toastEl.hidden = true;
+    }, 200);
+  }, 2500);
+}
+
+// ===== 메모 가져오기 =====
+function isValidMemo(memo) {
+  return (
+    memo &&
+    typeof memo === 'object' &&
+    typeof memo.id === 'string' &&
+    typeof memo.content === 'string' &&
+    (memo.folder === null || typeof memo.folder === 'string') &&
+    typeof memo.starred === 'boolean' &&
+    Array.isArray(memo.images) &&
+    typeof memo.createdAt === 'string' &&
+    typeof memo.updatedAt === 'string'
+  );
+}
+
+function importMemos(parsed) {
+  if (!Array.isArray(parsed) || parsed.length === 0 || !parsed.every(isValidMemo)) {
+    showToast('올바른 메모 백업 파일이 아닙니다.');
+    return;
+  }
+
+  const existingMemos = getMemos();
+  const existingIds = new Set(existingMemos.map((memo) => memo.id));
+  const newMemos = parsed.filter((memo) => !existingIds.has(memo.id));
+  const duplicateCount = parsed.length - newMemos.length;
+
+  setMemos([...newMemos, ...existingMemos]);
+  renderList();
+
+  if (newMemos.length === 0) {
+    showToast('가져올 새 메모가 없습니다 (모두 중복).');
+  } else {
+    const suffix = duplicateCount > 0 ? ` (중복 ${duplicateCount}개 제외)` : '';
+    showToast(`메모 ${newMemos.length}개를 가져왔습니다.${suffix}`);
+  }
+}
+
+importBtn.addEventListener('click', () => {
+  closeMoreMenu();
+  importFileInput.click();
+});
+
+importFileInput.addEventListener('change', () => {
+  const file = importFileInput.files[0];
+  importFileInput.value = '';
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      importMemos(parsed);
+    } catch (err) {
+      showToast('올바른 JSON 파일이 아닙니다.');
+    }
+  };
+  reader.onerror = () => {
+    showToast('파일을 읽는 중 오류가 발생했습니다.');
+  };
+  reader.readAsText(file);
 });
 
 detailBackBtn.addEventListener('click', closeDetail);
