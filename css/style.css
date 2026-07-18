@@ -95,7 +95,7 @@ body {
   outline: none;
   resize: vertical;
   font-family: inherit;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 300;
   line-height: 1.6;
   color: var(--color-text-title);
@@ -104,7 +104,7 @@ body {
 
 #memo-input::placeholder {
   color: var(--color-text-muted);
-  font-size: 18px;
+  font-size: 16px;
 }
 
 [data-theme="dark"] #memo-input {
@@ -180,7 +180,7 @@ body {
   border: none;
   background-color: var(--color-point);
   color: #FFFFFF;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 400;
   letter-spacing: 2px;
   height: 44px;
@@ -222,7 +222,7 @@ body {
 
 #search-input::placeholder {
   color: var(--color-text-muted);
-  font-size: 18px;
+  font-size: 16px;
 }
 
 [data-theme="dark"] #search-input::placeholder {
@@ -255,7 +255,7 @@ body {
 }
 
 .memo-item-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   color: var(--color-text-title);
   white-space: nowrap;
@@ -311,7 +311,7 @@ body {
 .empty-message {
   text-align: center;
   color: var(--color-text-muted);
-  font-size: 18px;
+  font-size: 16px;
   padding: 32px 0;
 }
 

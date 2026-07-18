@@ -264,6 +264,7 @@
 
 ### Service Worker
 - [ ] `sw.js` 생성 — 캐시 파일 목록 정의
+- [ ] `skipWaiting()` + `clients.claim()` 적용 — 배포 후 앱 재실행 시 최신 버전 즉시 반영
 - [ ] 오프라인에서 캐시된 파일 제공
 - [ ] `js/sw-register.js` 생성 (Service Worker 등록)
 
