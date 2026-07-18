@@ -67,14 +67,14 @@
 
 | 역할 | 변수명 | HEX | 용도 |
 |---|---|---|---|
-| Brand Navy | `--color-brand` | `#22242E` | 로고 텍스트, 주요 액션 버튼 (앱 아이콘 배경 색상) |
+| Brand Navy | `--color-brand` | `#1E3A5F` | 헤더 배경 (앱 아이콘 워드마크 글자색과 동일) |
 | Point Pink | `--color-point` | `#FF6FB0` | 별표 아이콘, 중요 메모 강조 |
 
 #### Light Mode
 
 | 역할 | 변수명 | HEX | 용도 |
 |---|---|---|---|
-| Background | `--color-bg` | `#FDF6E7` | 페이지 전체 배경, 헤더 배경 포함 (앱 아이콘 워드마크 톤) |
+| Background | `--color-bg` | `#FDF6E7` | 페이지 전체 배경 |
 | Title | `--color-text-title` | `#22242E` | 제목, 강조 텍스트 |
 | Body | `--color-text-body` | `#514F5C` | 본문, 일반 텍스트 |
 | Placeholder | `--color-text-muted` | `#BFB5A3` | 플레이스홀더, 비활성 텍스트 |

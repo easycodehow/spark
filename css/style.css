@@ -3,7 +3,7 @@
    ========================================================================== */
 :root {
   /* Brand Colors */
-  --color-brand: #22242E;
+  --color-brand: #1E3A5F;
   --color-point: #FF6FB0;
 
   /* Light Mode */
@@ -49,7 +49,7 @@ body {
   display: flex;
   align-items: center;
   padding: 16px 20px;
-  background-color: var(--color-bg);
+  background-color: var(--color-brand);
 }
 
 [data-theme="dark"] #app-header {
@@ -57,9 +57,9 @@ body {
 }
 
 .logo {
-  font-size: 30px;
+  font-size: 20px;
   font-weight: 700;
-  color: var(--color-brand);
+  color: #FFFFFF;
   letter-spacing: 0.5px;
 }
 
@@ -151,8 +151,9 @@ body {
   border: 1.5px solid var(--color-point);
   color: var(--color-point);
   font-size: 20px;
-  height: 44px;
-  padding: 0 14px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -182,9 +183,9 @@ body {
   color: #FFFFFF;
   font-size: 16px;
   font-weight: 400;
-  letter-spacing: 2px;
-  height: 44px;
-  padding: 0 20px;
+  letter-spacing: 0;
+  height: 36px;
+  padding: 0 16px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
