@@ -23,6 +23,19 @@
 }
 
 /* ==========================================================================
+   글자크기 배율 (더보기 메뉴 > 글자크기, 5단계)
+   ========================================================================== */
+:root {
+  --font-scale: 1;
+}
+
+[data-font-size="xs"] { --font-scale: 0.8125; }
+[data-font-size="s"]  { --font-scale: 0.9375; }
+[data-font-size="m"]  { --font-scale: 1; }
+[data-font-size="l"]  { --font-scale: 1.125; }
+[data-font-size="xl"] { --font-scale: 1.25; }
+
+/* ==========================================================================
    기본 리셋
    ========================================================================== */
 * {
@@ -105,7 +118,7 @@ body {
   top: 100%;
   right: 20px;
   margin-top: 4px;
-  min-width: 160px;
+  min-width: 232px;
   background-color: #FFFFFF;
   border: 1px solid rgba(192, 57, 43, 0.4);
   border-radius: 8px;
@@ -139,6 +152,100 @@ body {
   color: var(--color-text-title-dark);
 }
 
+.more-menu-fontsize {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  cursor: default;
+}
+
+.more-menu-fontsize-label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+[data-theme="dark"] .more-menu-fontsize-label {
+  color: var(--color-text-muted-dark);
+}
+
+.fontsize-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fontsize-btn-group {
+  display: flex;
+  border: 1px solid var(--color-text-muted);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.fontsize-step-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--color-text-body);
+  font-family: inherit;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fontsize-step-btn:first-child {
+  border-right: 1px solid var(--color-text-muted);
+}
+
+.fontsize-step-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+[data-theme="dark"] .fontsize-btn-group {
+  border-color: var(--color-text-muted-dark);
+}
+
+[data-theme="dark"] .fontsize-step-btn {
+  color: var(--color-text-body-dark);
+}
+
+[data-theme="dark"] .fontsize-step-btn:first-child {
+  border-right-color: var(--color-text-muted-dark);
+}
+
+.fontsize-dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.fontsize-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--color-text-muted);
+}
+
+.fontsize-dot.active {
+  width: 9px;
+  height: 9px;
+  background-color: var(--color-point);
+}
+
+[data-theme="dark"] .fontsize-dot {
+  background-color: var(--color-text-muted-dark);
+}
+
+[data-theme="dark"] .fontsize-dot.active {
+  background-color: var(--color-point-dark);
+}
+
 /* ==========================================================================
    메인 (메모 입력 / 목록)
    ========================================================================== */
@@ -167,7 +274,7 @@ body {
   outline: none;
   resize: vertical;
   font-family: inherit;
-  font-size: 16px;
+  font-size: calc(16px * var(--font-scale));
   font-weight: 300;
   line-height: 1.6;
   color: var(--color-text-title);
@@ -176,7 +283,7 @@ body {
 
 #memo-input::placeholder {
   color: var(--color-text-muted);
-  font-size: 16px;
+  font-size: calc(16px * var(--font-scale));
 }
 
 [data-theme="dark"] #memo-input {
@@ -282,7 +389,7 @@ body {
   border: 1px solid rgba(192, 57, 43, 0.4);
   border-radius: 4px;
   padding: 10px 14px;
-  font-size: 17px;
+  font-size: calc(17px * var(--font-scale));
   font-family: inherit;
   color: var(--color-text-title);
   background-color: #FFFFFF;
@@ -295,7 +402,7 @@ body {
 
 #search-input::placeholder {
   color: var(--color-text-muted);
-  font-size: 16px;
+  font-size: calc(16px * var(--font-scale));
 }
 
 [data-theme="dark"] #search-input::placeholder {
@@ -328,7 +435,7 @@ body {
 }
 
 .memo-item-title {
-  font-size: 16px;
+  font-size: calc(16px * var(--font-scale));
   font-weight: 500;
   color: var(--color-text-title);
   white-space: nowrap;
@@ -341,7 +448,7 @@ body {
 }
 
 .memo-item-date {
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale));
   color: var(--color-text-muted);
   margin-top: 4px;
 }
@@ -384,7 +491,7 @@ body {
 .empty-message {
   text-align: center;
   color: var(--color-text-muted);
-  font-size: 16px;
+  font-size: calc(16px * var(--font-scale));
   padding: 32px 0;
 }
 
@@ -429,7 +536,7 @@ body {
 }
 
 .detail-content {
-  font-size: 16px;
+  font-size: calc(16px * var(--font-scale));
   font-weight: 300;
   line-height: 1.6;
   color: var(--color-text-title);
@@ -442,7 +549,7 @@ body {
 }
 
 .detail-date {
-  font-size: 14px;
+  font-size: calc(14px * var(--font-scale));
   color: var(--color-text-muted);
   margin-top: auto;
   padding-top: 16px;

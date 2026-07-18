@@ -1,6 +1,8 @@
 // spark 메모앱 - 메인 로직
 
 const STORAGE_KEY = 'spark-memos';
+const FONT_SIZE_KEY = 'spark-font-size';
+const FONT_SIZES = ['xs', 's', 'm', 'l', 'xl'];
 
 let editingId = null;
 let showStarredOnly = false;
@@ -20,6 +22,9 @@ const exportBtn = document.getElementById('export-btn');
 const importBtn = document.getElementById('import-btn');
 const importFileInput = document.getElementById('import-file-input');
 const toastEl = document.getElementById('toast');
+const fontSizeDecreaseBtn = document.getElementById('fontsize-decrease');
+const fontSizeIncreaseBtn = document.getElementById('fontsize-increase');
+const fontSizeDots = document.querySelectorAll('.fontsize-dot');
 
 const memoEditorSection = document.querySelector('.memo-editor');
 const memoToolbar = document.querySelector('.memo-toolbar');
@@ -357,6 +362,37 @@ importFileInput.addEventListener('change', () => {
   };
   reader.readAsText(file);
 });
+
+// ===== 글자크기 조절 =====
+function applyFontSize(size) {
+  document.documentElement.setAttribute('data-font-size', size);
+  fontSizeDots.forEach((dot) => {
+    dot.classList.toggle('active', dot.dataset.size === size);
+  });
+
+  const index = FONT_SIZES.indexOf(size);
+  fontSizeDecreaseBtn.disabled = index <= 0;
+  fontSizeIncreaseBtn.disabled = index >= FONT_SIZES.length - 1;
+}
+
+function loadFontSize() {
+  const saved = localStorage.getItem(FONT_SIZE_KEY);
+  applyFontSize(FONT_SIZES.includes(saved) ? saved : 'm');
+}
+
+function stepFontSize(delta) {
+  const current = document.documentElement.getAttribute('data-font-size') || 'm';
+  const currentIndex = FONT_SIZES.indexOf(current);
+  const nextIndex = Math.min(FONT_SIZES.length - 1, Math.max(0, currentIndex + delta));
+  const nextSize = FONT_SIZES[nextIndex];
+  applyFontSize(nextSize);
+  localStorage.setItem(FONT_SIZE_KEY, nextSize);
+}
+
+fontSizeDecreaseBtn.addEventListener('click', () => stepFontSize(-1));
+fontSizeIncreaseBtn.addEventListener('click', () => stepFontSize(1));
+
+loadFontSize();
 
 detailBackBtn.addEventListener('click', closeDetail);
 

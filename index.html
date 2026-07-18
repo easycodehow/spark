@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" data-theme="light">
+<html lang="ko" data-theme="light" data-font-size="m">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -24,7 +24,22 @@
     <div id="more-menu" class="more-menu" hidden>
       <button id="export-btn" class="more-menu-item" type="button">메모 내보내기</button>
       <button id="import-btn" class="more-menu-item" type="button">메모 가져오기</button>
-      <button id="font-size-btn" class="more-menu-item" type="button">글자크기 조절</button>
+      <div class="more-menu-item more-menu-fontsize">
+        <span class="more-menu-fontsize-label">글자크기</span>
+        <div class="fontsize-stepper">
+          <div class="fontsize-dots" role="group" aria-label="글자크기 단계">
+            <span class="fontsize-dot" data-size="xs"></span>
+            <span class="fontsize-dot" data-size="s"></span>
+            <span class="fontsize-dot" data-size="m"></span>
+            <span class="fontsize-dot" data-size="l"></span>
+            <span class="fontsize-dot" data-size="xl"></span>
+          </div>
+          <div class="fontsize-btn-group">
+            <button id="fontsize-decrease" class="fontsize-step-btn" type="button" aria-label="글자크기 작게">−</button>
+            <button id="fontsize-increase" class="fontsize-step-btn" type="button" aria-label="글자크기 크게">+</button>
+          </div>
+        </div>
+      </div>
       <button id="dark-mode-btn" class="more-menu-item" type="button">다크모드</button>
     </div>
   </header>
