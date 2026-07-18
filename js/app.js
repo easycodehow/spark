@@ -16,6 +16,7 @@ const emptyMessage = document.getElementById('empty-message');
 
 const moreMenuToggle = document.getElementById('more-menu-toggle');
 const moreMenu = document.getElementById('more-menu');
+const exportBtn = document.getElementById('export-btn');
 
 const memoEditorSection = document.querySelector('.memo-editor');
 const memoToolbar = document.querySelector('.memo-toolbar');
@@ -245,6 +246,32 @@ moreMenuToggle.addEventListener('click', (event) => {
 document.addEventListener('click', (event) => {
   if (moreMenu.hidden) return;
   if (moreMenu.contains(event.target) || event.target === moreMenuToggle) return;
+  closeMoreMenu();
+});
+
+// ===== 메모 내보내기 =====
+function exportMemos() {
+  const memos = getMemos();
+  const json = JSON.stringify(memos, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `spark-backup-${yyyy}${mm}${dd}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+exportBtn.addEventListener('click', () => {
+  exportMemos();
   closeMoreMenu();
 });
 
