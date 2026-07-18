@@ -42,6 +42,23 @@
       <ul id="memo-list"></ul>
       <p id="empty-message" class="empty-message">저장된 메모가 없습니다.</p>
     </section>
+
+    <!-- 상세보기 화면 -->
+    <section class="detail-view" hidden>
+      <div class="detail-header">
+        <button id="detail-back-btn" class="detail-back-btn" type="button" aria-label="뒤로가기">←</button>
+      </div>
+      <div class="detail-body">
+        <p id="detail-content" class="detail-content"></p>
+        <p id="detail-date" class="detail-date"></p>
+      </div>
+      <div class="detail-actions">
+        <button id="detail-edit-btn" class="detail-action-btn" type="button">수정</button>
+        <button id="detail-share-btn" class="detail-action-btn" type="button">공유</button>
+        <button id="detail-copy-btn" class="detail-action-btn" type="button">복사</button>
+        <button id="detail-delete-btn" class="detail-action-btn detail-action-btn--danger" type="button">삭제</button>
+      </div>
+    </section>
   </main>
 
   <!-- 푸터 -->

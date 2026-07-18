@@ -14,6 +14,20 @@ const filterToggle = document.getElementById('filter-toggle');
 const memoList = document.getElementById('memo-list');
 const emptyMessage = document.getElementById('empty-message');
 
+const memoEditorSection = document.querySelector('.memo-editor');
+const memoToolbar = document.querySelector('.memo-toolbar');
+const memoListSection = document.querySelector('.memo-list-section');
+const detailView = document.querySelector('.detail-view');
+const detailBackBtn = document.getElementById('detail-back-btn');
+const detailContent = document.getElementById('detail-content');
+const detailDate = document.getElementById('detail-date');
+const detailEditBtn = document.getElementById('detail-edit-btn');
+const detailShareBtn = document.getElementById('detail-share-btn');
+const detailCopyBtn = document.getElementById('detail-copy-btn');
+const detailDeleteBtn = document.getElementById('detail-delete-btn');
+
+let detailMemoId = null;
+
 // ===== LocalStorage 입출력 =====
 function getMemos() {
   const raw = localStorage.getItem(STORAGE_KEY);
@@ -24,11 +38,25 @@ function setMemos(memos) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(memos));
 }
 
+// ===== ID 생성 =====
+// crypto.randomUUID()는 보안 컨텍스트(HTTPS/localhost)에서만 지원되므로,
+// 미지원 환경(예: 같은 네트워크의 다른 기기에서 로컬 IP로 접속하는 경우)을 위한 대체 로직을 둔다.
+function generateId() {
+  if (window.crypto && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 // ===== CRUD =====
 function createMemo(content, starred) {
   const now = new Date().toISOString();
   const memo = {
-    id: crypto.randomUUID(),
+    id: generateId(),
     content,
     folder: null,
     starred,
@@ -66,6 +94,26 @@ function loadMemoIntoEditor(memo) {
   memoInput.value = memo.content;
   starToggle.setAttribute('aria-pressed', String(memo.starred));
   memoInput.focus();
+}
+
+// ===== 상세보기 =====
+function openDetail(memo) {
+  detailMemoId = memo.id;
+  detailContent.textContent = memo.content;
+  detailDate.textContent = `작성 ${formatDate(memo.createdAt)}  ·  수정 ${formatDate(memo.updatedAt)}`;
+
+  memoEditorSection.hidden = true;
+  memoToolbar.hidden = true;
+  memoListSection.hidden = true;
+  detailView.hidden = false;
+}
+
+function closeDetail() {
+  detailMemoId = null;
+  detailView.hidden = true;
+  memoEditorSection.hidden = false;
+  memoToolbar.hidden = false;
+  memoListSection.hidden = false;
 }
 
 // ===== 렌더링 =====
@@ -139,7 +187,7 @@ function renderList() {
     actionsDiv.append(starBtn, deleteBtn);
 
     li.append(contentDiv, actionsDiv);
-    li.addEventListener('click', () => loadMemoIntoEditor(memo));
+    li.addEventListener('click', () => openDetail(memo));
 
     memoList.appendChild(li);
   });
@@ -172,6 +220,53 @@ filterToggle.addEventListener('click', () => {
   showStarredOnly = !showStarredOnly;
   filterToggle.setAttribute('aria-pressed', String(showStarredOnly));
   renderList();
+});
+
+detailBackBtn.addEventListener('click', closeDetail);
+
+detailEditBtn.addEventListener('click', () => {
+  const memo = getMemos().find((item) => item.id === detailMemoId);
+  if (!memo) return;
+  closeDetail();
+  loadMemoIntoEditor(memo);
+});
+
+detailDeleteBtn.addEventListener('click', () => {
+  if (!detailMemoId) return;
+  if (!confirm('이 메모를 삭제할까요?')) return;
+  if (editingId === detailMemoId) resetEditor();
+  deleteMemo(detailMemoId);
+  closeDetail();
+  renderList();
+});
+
+detailShareBtn.addEventListener('click', async () => {
+  const memo = getMemos().find((item) => item.id === detailMemoId);
+  if (!memo) return;
+  if (!navigator.share) {
+    alert('이 브라우저는 공유 기능을 지원하지 않습니다.');
+    return;
+  }
+  try {
+    await navigator.share({ text: memo.content });
+  } catch (err) {
+    // 사용자가 공유를 취소한 경우 등은 무시
+  }
+});
+
+detailCopyBtn.addEventListener('click', async () => {
+  const memo = getMemos().find((item) => item.id === detailMemoId);
+  if (!memo) return;
+  try {
+    await navigator.clipboard.writeText(memo.content);
+    const original = detailCopyBtn.textContent;
+    detailCopyBtn.textContent = '복사됨';
+    setTimeout(() => {
+      detailCopyBtn.textContent = original;
+    }, 1500);
+  } catch (err) {
+    alert('복사에 실패했습니다.');
+  }
 });
 
 // ===== 초기 렌더링 =====
