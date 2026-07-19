@@ -306,7 +306,7 @@ function formatDate(isoString) {
 function getMemoTitle(memo) {
   const firstLine = memo.content.split('\n')[0].trim();
   if (firstLine) return firstLine;
-  if (memo.images.length > 0) return formatDate(memo.updatedAt);
+  if (memo.images.length > 0) return `[이미지] ${formatDate(memo.updatedAt)}`;
   return '(내용 없음)';
 }
 
