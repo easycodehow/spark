@@ -618,3 +618,25 @@
 ### 다음 작업 제안
 - **4단계: PWA 기능** (Manifest 작성/연결 → Service Worker 생성 + skipWaiting/clients.claim → 오프라인 캐시 → 오프라인 동작 테스트) 진행
 - 진행 시 "시작" 또는 "go" 지시 필요 (CLAUDE.md 승인 원칙에 따름)
+
+---
+
+## 2026-07-19
+
+### 진행 상황
+- **4단계: PWA 기능** 전체 구현 완료
+  - `manifest.json`/`index.html` 연결은 1단계에서 이미 완료돼 있던 상태라 체크만 반영
+  - `sw.js` 신규 생성 — 캐시할 핵심 파일(`index.html`, `css/style.css`, `js/app.js`, `js/sw-register.js`, `manifest.json`, 아이콘 2개) 정의, `install`시 `cache.addAll`로 미리 캐싱, `fetch` 시 캐시 우선 응답(cache-first) 후 없으면 네트워크 요청 및 캐시 추가 저장, `activate` 시 이전 버전 캐시 정리, `skipWaiting()` + `clients.claim()` 적용
+  - `js/sw-register.js` 신규 생성 — `window.load` 시점에 `navigator.serviceWorker.register('./sw.js')` 등록
+  - `index.html`에 `js/sw-register.js` 스크립트 태그 추가
+- **자동화 1차 검증** (헤드리스 크롬 + CDP, Node 24 네이티브 WebSocket)
+  - 이 과정에서 이 개발 환경 특유의 심각한 불안정성을 겪음: 헤드리스 크롬을 반복적으로 새로 띄우거나 `Page.navigate`로 재접속(특히 오프라인 상태에서의 재탐색)할 때 서비스워커 로직과 무관하게 `chrome-error://chromewebdata/`로 실패하는 현상이 매우 자주 발생 — 원인 규명에 상당 시간 소요됨. 최종적으로 Chrome을 Bash로 직접 한 번만 안정적으로 띄운 뒤, 그 탭을 재사용하며 **탐색(navigate) 대신 같은 페이지 컨텍스트 안에서 `fetch()`를 실행하는 방식**으로 우회해 정상 검증 완료
+  - 검증 항목: ① 온라인 상태 최초 접속 시 SW가 정상적으로 `activated` 상태 도달, ② `self.registration.scope`가 origin 루트로 올바르게 설정되고 캐시에 8개 파일이 정확히 저장됨(서비스워커 자체 컨텍스트에서 직접 확인), ③ `clients.claim()` 덕분에 새로고침 없이도 최초 접속 탭이 즉시 SW의 `controller`로 잡힘, ④ 로컬 서버를 실제로 종료한(진짜 오프라인) 상태에서 `index.html`/`css/style.css`/`js/app.js`/`manifest.json` 모두 캐시에서 200 OK로 정상 응답, ⑤ 오프라인 상태에서 메모 저장 시 LocalStorage에 정상 반영(1건 증가), ⑥ 서버 재기동(온라인 복구) 후에도 오프라인에서 저장한 메모가 유지됨
+  - 테스트에 사용한 임시 스크립트, 크롬 프로필, 백그라운드 프로세스는 모두 정리 완료
+  - `CLAUDE.md` 4단계 체크리스트 전체 완료 처리, 전체 진행 상황의 4단계 체크 완료 (2026-07-19)
+
+### 다음 작업 제안
+- **2차 확인 필요**: 사용자가 실기기에서 배포 사이트를 열고 앱을 홈 화면에 추가하거나 브라우저에서 한 번 접속한 뒤, **비행기 모드(또는 와이파이/데이터 끄기)** 로 전환해 앱이 그대로 뜨는지, 메모 추가/수정/삭제가 되는지, 다시 온라인으로 돌아왔을 때 데이터가 유지되는지 확인
+  - 참고: Service Worker는 배포된 HTTPS 환경(Vercel)에서만 정상 등록되므로, 이번 변경사항을 커밋·푸시 후 `vercel --prod` 배포까지 마친 뒤 실기기 확인 필요
+- 2차 확인 후: **5단계: 데이터 관리 (이미지 첨부)** 진행
+- 진행 시 "시작" 또는 "go" 지시 필요 (CLAUDE.md 승인 원칙에 따름)

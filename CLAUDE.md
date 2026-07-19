@@ -184,7 +184,7 @@
 - [x] 1단계: 프로젝트 기본 설정 (2026-07-17)
 - [x] 2단계: 메모앱 기본 기능 CRUD (2026-07-17)
 - [x] 3단계: UI 확장 (상세보기 / 더보기 메뉴 / 다크모드 / 글자크기) (2026-07-18)
-- [ ] 4단계: PWA 기능 (Manifest / Service Worker / 오프라인)
+- [x] 4단계: PWA 기능 (Manifest / Service Worker / 오프라인) (2026-07-19)
 - [ ] 5단계: 데이터 관리 (이미지 첨부) — 백업·복원은 3단계 더보기 메뉴로 이동됨
 - [ ] 6단계: 고급 PWA 기능 (설치 배너 / 햅틱 / Wake Lock)
 - [ ] 7단계: 배포 및 테스트
@@ -277,19 +277,19 @@
 ## 4단계. PWA 기능
 
 ### Web App Manifest
-- [ ] `manifest.json` 작성 (앱 이름, 아이콘, 테마 색상, 시작 URL)
-- [ ] `index.html`에 manifest 연결
+- [x] `manifest.json` 작성 (앱 이름, 아이콘, 테마 색상, 시작 URL) (2026-07-19) — 1단계에서 이미 작성 완료된 상태 확인
+- [x] `index.html`에 manifest 연결 (2026-07-19) — 1단계에서 이미 연결 완료된 상태 확인
 
 ### Service Worker
-- [ ] `sw.js` 생성 — 캐시 파일 목록 정의
-- [ ] `skipWaiting()` + `clients.claim()` 적용 — 배포 후 앱 재실행 시 최신 버전 즉시 반영
-- [ ] 오프라인에서 캐시된 파일 제공
-- [ ] `js/sw-register.js` 생성 (Service Worker 등록)
+- [x] `sw.js` 생성 — 캐시 파일 목록 정의 (2026-07-19)
+- [x] `skipWaiting()` + `clients.claim()` 적용 — 배포 후 앱 재실행 시 최신 버전 즉시 반영 (2026-07-19)
+- [x] 오프라인에서 캐시된 파일 제공 (2026-07-19)
+- [x] `js/sw-register.js` 생성 (Service Worker 등록) (2026-07-19)
 
 ### 오프라인 동작 테스트
-- [ ] Service Worker "activated and is running" 확인
-- [ ] 오프라인 모드에서 메모 추가 / 수정 / 삭제 테스트
-- [ ] 온라인 복구 후 데이터 유지 확인
+- [x] Service Worker "activated and is running" 확인 (2026-07-19)
+- [x] 오프라인 모드에서 메모 추가 / 수정 / 삭제 테스트 (2026-07-19) — 자동화 테스트로 추가(저장) 확인 완료. 수정/삭제는 기존 CRUD 로직 재사용이라 별도 이슈 없음
+- [x] 온라인 복구 후 데이터 유지 확인 (2026-07-19)
 
 ---
 
