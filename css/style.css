@@ -100,6 +100,29 @@ body {
   color: var(--color-text-title-dark);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.install-btn {
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: transparent;
+  color: #FFFFFF;
+  font-size: 13px;
+  font-family: inherit;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+[data-theme="dark"] .install-btn {
+  border-color: var(--color-text-muted-dark);
+  color: var(--color-text-title-dark);
+}
+
 .more-menu-toggle {
   border: none;
   background: transparent;

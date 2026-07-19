@@ -22,6 +22,7 @@ const filterToggle = document.getElementById('filter-toggle');
 const memoList = document.getElementById('memo-list');
 const emptyMessage = document.getElementById('empty-message');
 
+const installBtn = document.getElementById('install-btn');
 const moreMenuToggle = document.getElementById('more-menu-toggle');
 const moreMenu = document.getElementById('more-menu');
 const exportBtn = document.getElementById('export-btn');
@@ -652,6 +653,28 @@ detailCopyBtn.addEventListener('click', async () => {
   } catch (err) {
     alert('복사에 실패했습니다.');
   }
+});
+
+// ===== 앱 설치 유도 배너 =====
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (event) => {
+  event.preventDefault();
+  deferredInstallPrompt = event;
+  installBtn.hidden = false;
+});
+
+installBtn.addEventListener('click', async () => {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  installBtn.hidden = true;
+});
+
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  installBtn.hidden = true;
 });
 
 // ===== 초기 렌더링 =====
