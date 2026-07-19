@@ -234,7 +234,6 @@ async function addImageFile(file) {
   }
 
   let base64;
-  let wasCompressed = false;
 
   if (file.size > IMAGE_MAX_BYTES) {
     try {
@@ -247,7 +246,6 @@ async function addImageFile(file) {
       showToast('이미지 용량이 너무 커서 자동으로 줄여도 500KB를 넘습니다.');
       return;
     }
-    wasCompressed = true;
   } else {
     try {
       base64 = await readFileAsDataURL(file);
@@ -264,9 +262,6 @@ async function addImageFile(file) {
 
   editorImages.push(base64);
   renderEditorImagePreview();
-  if (wasCompressed) {
-    showToast('이미지 용량이 커서 자동으로 줄여 첨부했습니다.');
-  }
 }
 
 // ===== 상세보기 =====
@@ -308,9 +303,11 @@ function formatDate(isoString) {
   return `${yyyy}.${mm}.${dd} ${hh}:${min}`;
 }
 
-function getMemoTitle(content) {
-  const firstLine = content.split('\n')[0].trim();
-  return firstLine || '(내용 없음)';
+function getMemoTitle(memo) {
+  const firstLine = memo.content.split('\n')[0].trim();
+  if (firstLine) return firstLine;
+  if (memo.images.length > 0) return formatDate(memo.updatedAt);
+  return '(내용 없음)';
 }
 
 function renderList() {
@@ -332,7 +329,7 @@ function renderList() {
 
     const titleEl = document.createElement('p');
     titleEl.className = 'memo-item-title';
-    titleEl.textContent = getMemoTitle(memo.content);
+    titleEl.textContent = getMemoTitle(memo);
 
     const dateEl = document.createElement('p');
     dateEl.className = 'memo-item-date';
@@ -382,12 +379,12 @@ starToggle.addEventListener('click', () => {
 
 saveBtn.addEventListener('click', () => {
   const content = memoInput.value.trim();
-  if (!content) {
-    showToast('메모 내용을 입력해주세요.');
+  const images = [...editorImages];
+  if (!content && images.length === 0) {
+    showToast('메모 내용이나 이미지를 추가해주세요.');
     return;
   }
   const starred = starToggle.getAttribute('aria-pressed') === 'true';
-  const images = [...editorImages];
 
   const saved = editingId
     ? updateMemo(editingId, { content, starred, images })
