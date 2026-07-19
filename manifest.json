@@ -4,7 +4,7 @@
   "description": "오프라인 메모장 애플리케이션",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#22242E",
+  "background_color": "#FDF6E7",
   "theme_color": "#1E3A5F",
   "icons": [
     {
