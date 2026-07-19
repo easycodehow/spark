@@ -130,9 +130,17 @@ function deleteMemo(id) {
 }
 
 // ===== 편집기 상태 =====
+
+// 입력한 줄 수만큼 textarea 높이를 자동으로 늘림 (최대 높이는 CSS max-height가 제한, 그 이상은 내부 스크롤)
+function autoGrowMemoInput() {
+  memoInput.style.height = 'auto';
+  memoInput.style.height = `${memoInput.scrollHeight}px`;
+}
+
 function resetEditor() {
   editingId = null;
   memoInput.value = '';
+  memoInput.style.height = '';
   starToggle.setAttribute('aria-pressed', 'false');
   editorImages = [];
   renderEditorImagePreview();
@@ -141,11 +149,14 @@ function resetEditor() {
 function loadMemoIntoEditor(memo) {
   editingId = memo.id;
   memoInput.value = memo.content;
+  autoGrowMemoInput();
   starToggle.setAttribute('aria-pressed', String(memo.starred));
   editorImages = [...memo.images];
   renderEditorImagePreview();
   memoInput.focus();
 }
+
+memoInput.addEventListener('input', autoGrowMemoInput);
 
 // ===== 이미지 첨부 =====
 function renderEditorImagePreview() {

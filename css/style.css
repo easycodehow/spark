@@ -300,7 +300,9 @@ body {
   width: 100%;
   border: none;
   outline: none;
-  resize: vertical;
+  resize: none;
+  overflow-y: auto;
+  max-height: 50vh;
   font-family: inherit;
   font-size: calc(16px * var(--font-scale));
   font-weight: 300;
