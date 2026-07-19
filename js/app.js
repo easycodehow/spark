@@ -173,31 +173,100 @@ function renderEditorImagePreview() {
   });
 }
 
-function addImageFile(file) {
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImageElement(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('이미지를 불러올 수 없습니다.'));
+    img.src = dataUrl;
+  });
+}
+
+// 카메라 촬영본처럼 500KB를 넘는 사진을, 화질/해상도를 단계적으로 낮춰가며
+// 캔버스로 다시 인코딩해 용량 제한 안으로 맞춘다. 끝까지 못 맞추면 null 반환.
+async function compressImageToLimit(file, maxBytes) {
+  const originalDataUrl = await readFileAsDataURL(file);
+  const img = await loadImageElement(originalDataUrl);
+
+  let width = img.naturalWidth;
+  let height = img.naturalHeight;
+  let quality = 0.85;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  for (let attempt = 0; attempt < 12; attempt++) {
+    canvas.width = width;
+    canvas.height = height;
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(img, 0, 0, width, height);
+    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+    const base64Length = dataUrl.length - dataUrl.indexOf(',') - 1;
+    const byteSize = Math.ceil((base64Length * 3) / 4);
+
+    if (byteSize <= maxBytes) return dataUrl;
+
+    if (quality > 0.5) {
+      quality -= 0.1;
+    } else {
+      width = Math.round(width * 0.8);
+      height = Math.round(height * 0.8);
+      quality = 0.7;
+    }
+    if (width < 80 || height < 80) break;
+  }
+  return null;
+}
+
+async function addImageFile(file) {
   if (!file) return;
   if (!file.type.startsWith('image/')) {
     showToast('이미지 파일만 첨부할 수 있습니다.');
     return;
   }
+
+  let base64;
+  let wasCompressed = false;
+
   if (file.size > IMAGE_MAX_BYTES) {
-    showToast('이미지 용량은 1장당 최대 500KB까지 첨부할 수 있습니다.');
-    return;
+    try {
+      base64 = await compressImageToLimit(file, IMAGE_MAX_BYTES);
+    } catch (err) {
+      showToast('이미지를 불러오지 못했습니다.');
+      return;
+    }
+    if (!base64) {
+      showToast('이미지 용량이 너무 커서 자동으로 줄여도 500KB를 넘습니다.');
+      return;
+    }
+    wasCompressed = true;
+  } else {
+    try {
+      base64 = await readFileAsDataURL(file);
+    } catch (err) {
+      showToast('이미지를 읽는 중 오류가 발생했습니다.');
+      return;
+    }
   }
-  if (!hasStorageRoomFor(file.size * 1.4)) {
-    // Base64 인코딩 시 원본보다 약 1.37배 커지는 점을 감안한 여유치
+
+  if (!hasStorageRoomFor(base64.length * 2)) {
     showToast('저장 공간이 부족해 이미지를 추가할 수 없습니다.');
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    editorImages.push(reader.result);
-    renderEditorImagePreview();
-  };
-  reader.onerror = () => {
-    showToast('이미지를 읽는 중 오류가 발생했습니다.');
-  };
-  reader.readAsDataURL(file);
+  editorImages.push(base64);
+  renderEditorImagePreview();
+  if (wasCompressed) {
+    showToast('이미지 용량이 커서 자동으로 줄여 첨부했습니다.');
+  }
 }
 
 // ===== 상세보기 =====
@@ -313,7 +382,10 @@ starToggle.addEventListener('click', () => {
 
 saveBtn.addEventListener('click', () => {
   const content = memoInput.value.trim();
-  if (!content) return;
+  if (!content) {
+    showToast('메모 내용을 입력해주세요.');
+    return;
+  }
   const starred = starToggle.getAttribute('aria-pressed') === 'true';
   const images = [...editorImages];
 
