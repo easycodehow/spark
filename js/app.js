@@ -632,10 +632,11 @@ detailCopyBtn.addEventListener('click', async () => {
   if (!memo) return;
   try {
     await navigator.clipboard.writeText(memo.content);
-    const original = detailCopyBtn.textContent;
-    detailCopyBtn.textContent = '복사됨';
+    const labelEl = detailCopyBtn.querySelector('.detail-action-label');
+    const original = labelEl.textContent;
+    labelEl.textContent = '복사됨';
     setTimeout(() => {
-      detailCopyBtn.textContent = original;
+      labelEl.textContent = original;
     }, 1500);
   } catch (err) {
     alert('복사에 실패했습니다.');

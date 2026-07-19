@@ -661,12 +661,22 @@ body {
 .detail-action-btn {
   flex: 1;
   height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   border: 1px solid var(--color-text-muted);
   background: transparent;
   border-radius: 8px;
   font-size: 14px;
+  font-family: inherit;
   color: var(--color-text-body);
   cursor: pointer;
+}
+
+.detail-action-icon {
+  font-size: 14px;
+  line-height: 1;
 }
 
 [data-theme="dark"] .detail-action-btn {
