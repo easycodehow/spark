@@ -563,15 +563,6 @@ body {
   color: var(--color-point-dark);
 }
 
-.memo-delete-btn {
-  border: none;
-  background: transparent;
-  font-size: 16px;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  padding: 4px 8px;
-}
-
 .empty-message {
   text-align: center;
   color: var(--color-text-muted);

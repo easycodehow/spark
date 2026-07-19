@@ -351,18 +351,7 @@ function renderList() {
       renderList();
     });
 
-    const deleteBtn = document.createElement('button');
-    deleteBtn.type = 'button';
-    deleteBtn.className = 'memo-delete-btn';
-    deleteBtn.textContent = '삭제';
-    deleteBtn.addEventListener('click', (event) => {
-      event.stopPropagation();
-      if (editingId === memo.id) resetEditor();
-      deleteMemo(memo.id);
-      renderList();
-    });
-
-    actionsDiv.append(starBtn, deleteBtn);
+    actionsDiv.append(starBtn);
 
     li.append(contentDiv, actionsDiv);
     li.addEventListener('click', () => openDetail(memo));
