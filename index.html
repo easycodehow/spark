@@ -52,11 +52,26 @@
     <!-- 메모 입력 영역 -->
     <section class="memo-editor">
       <textarea id="memo-input" placeholder="메모를 입력하세요..." rows="6"></textarea>
+
+      <!-- 첨부 이미지 미리보기 -->
+      <div id="editor-image-preview" class="editor-image-preview"></div>
+
       <div class="editor-actions">
+        <div class="image-add-wrapper">
+          <button id="image-add-btn" class="icon-btn" type="button" aria-label="이미지 추가" aria-expanded="false">📷</button>
+          <div id="image-add-menu" class="image-add-menu" hidden>
+            <button id="image-gallery-btn" class="image-add-menu-item" type="button">갤러리에서 선택</button>
+            <button id="image-camera-btn" class="image-add-menu-item" type="button">카메라로 촬영</button>
+          </div>
+        </div>
         <button id="star-toggle" class="icon-btn" type="button" aria-label="중요 메모로 표시" aria-pressed="false">★</button>
         <button id="save-btn" class="primary-btn" type="button">저장</button>
       </div>
     </section>
+
+    <!-- 이미지 선택용 숨김 파일 입력 (모바일 file input 제약으로 display:none 대신 시각적으로만 숨김) -->
+    <input type="file" id="image-gallery-input" class="visually-hidden" accept="image/*" />
+    <input type="file" id="image-camera-input" class="visually-hidden" accept="image/*" capture="environment" />
 
     <!-- 검색 & 필터 -->
     <section class="memo-toolbar">
@@ -77,6 +92,7 @@
       </div>
       <div class="detail-body">
         <p id="detail-content" class="detail-content"></p>
+        <div id="detail-images" class="detail-images"></div>
         <p id="detail-date" class="detail-date"></p>
       </div>
       <div class="detail-actions">

@@ -5,9 +5,13 @@ const FONT_SIZE_KEY = 'spark-font-size';
 const FONT_SIZES = ['xs', 's', 'm', 'l', 'xl'];
 const THEME_KEY = 'spark-theme';
 const THEME_COLOR = { light: '#1E3A5F', dark: '#101014' };
+const IMAGE_MAX_BYTES = 500 * 1024;
+// 브라우저별로 LocalStorage 실제 한도가 다르지만(대부분 5MB 내외), 보수적으로 5MB를 기준 용량으로 삼는다.
+const STORAGE_QUOTA_BYTES = 5 * 1024 * 1024;
 
 let editingId = null;
 let showStarredOnly = false;
+let editorImages = [];
 
 // ===== DOM 참조 =====
 const memoInput = document.getElementById('memo-input');
@@ -41,6 +45,15 @@ const detailEditBtn = document.getElementById('detail-edit-btn');
 const detailShareBtn = document.getElementById('detail-share-btn');
 const detailCopyBtn = document.getElementById('detail-copy-btn');
 const detailDeleteBtn = document.getElementById('detail-delete-btn');
+const detailImages = document.getElementById('detail-images');
+
+const imageAddBtn = document.getElementById('image-add-btn');
+const imageAddMenu = document.getElementById('image-add-menu');
+const imageGalleryBtn = document.getElementById('image-gallery-btn');
+const imageCameraBtn = document.getElementById('image-camera-btn');
+const imageGalleryInput = document.getElementById('image-gallery-input');
+const imageCameraInput = document.getElementById('image-camera-input');
+const editorImagePreview = document.getElementById('editor-image-preview');
 
 let detailMemoId = null;
 
@@ -51,7 +64,27 @@ function getMemos() {
 }
 
 function setMemos(memos) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(memos));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(memos));
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+// ===== LocalStorage 용량 체크 =====
+function estimateStorageUsageBytes() {
+  let total = 0;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    const value = localStorage.getItem(key) || '';
+    total += (key.length + value.length) * 2; // UTF-16 기준 대략치
+  }
+  return total;
+}
+
+function hasStorageRoomFor(additionalBytes) {
+  return estimateStorageUsageBytes() + additionalBytes < STORAGE_QUOTA_BYTES;
 }
 
 // ===== ID 생성 =====
@@ -69,28 +102,28 @@ function generateId() {
 }
 
 // ===== CRUD =====
-function createMemo(content, starred) {
+function createMemo(content, starred, images) {
   const now = new Date().toISOString();
   const memo = {
     id: generateId(),
     content,
     folder: null,
     starred,
-    images: [],
+    images,
     createdAt: now,
     updatedAt: now,
   };
   const memos = getMemos();
   memos.unshift(memo);
-  setMemos(memos);
+  return setMemos(memos);
 }
 
 function updateMemo(id, changes) {
   const memos = getMemos();
   const target = memos.find((memo) => memo.id === id);
-  if (!target) return;
+  if (!target) return false;
   Object.assign(target, changes, { updatedAt: new Date().toISOString() });
-  setMemos(memos);
+  return setMemos(memos);
 }
 
 function deleteMemo(id) {
@@ -103,13 +136,70 @@ function resetEditor() {
   editingId = null;
   memoInput.value = '';
   starToggle.setAttribute('aria-pressed', 'false');
+  editorImages = [];
+  renderEditorImagePreview();
 }
 
 function loadMemoIntoEditor(memo) {
   editingId = memo.id;
   memoInput.value = memo.content;
   starToggle.setAttribute('aria-pressed', String(memo.starred));
+  editorImages = [...memo.images];
+  renderEditorImagePreview();
   memoInput.focus();
+}
+
+// ===== 이미지 첨부 =====
+function renderEditorImagePreview() {
+  editorImagePreview.innerHTML = '';
+  editorImages.forEach((base64, index) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'editor-image-thumb';
+
+    const img = document.createElement('img');
+    img.src = base64;
+    img.alt = `첨부 이미지 ${index + 1}`;
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'editor-image-remove-btn';
+    removeBtn.textContent = '×';
+    removeBtn.setAttribute('aria-label', '이미지 삭제');
+    removeBtn.addEventListener('click', () => {
+      editorImages.splice(index, 1);
+      renderEditorImagePreview();
+    });
+
+    thumb.append(img, removeBtn);
+    editorImagePreview.appendChild(thumb);
+  });
+}
+
+function addImageFile(file) {
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    showToast('이미지 파일만 첨부할 수 있습니다.');
+    return;
+  }
+  if (file.size > IMAGE_MAX_BYTES) {
+    showToast('이미지 용량은 1장당 최대 500KB까지 첨부할 수 있습니다.');
+    return;
+  }
+  if (!hasStorageRoomFor(file.size * 1.4)) {
+    // Base64 인코딩 시 원본보다 약 1.37배 커지는 점을 감안한 여유치
+    showToast('저장 공간이 부족해 이미지를 추가할 수 없습니다.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    editorImages.push(reader.result);
+    renderEditorImagePreview();
+  };
+  reader.onerror = () => {
+    showToast('이미지를 읽는 중 오류가 발생했습니다.');
+  };
+  reader.readAsDataURL(file);
 }
 
 // ===== 상세보기 =====
@@ -117,6 +207,14 @@ function openDetail(memo) {
   detailMemoId = memo.id;
   detailContent.textContent = memo.content;
   detailDate.textContent = `작성 ${formatDate(memo.createdAt)}  ·  수정 ${formatDate(memo.updatedAt)}`;
+
+  detailImages.innerHTML = '';
+  memo.images.forEach((base64, index) => {
+    const img = document.createElement('img');
+    img.src = base64;
+    img.alt = `첨부 이미지 ${index + 1}`;
+    detailImages.appendChild(img);
+  });
 
   memoEditorSection.hidden = true;
   memoToolbar.hidden = true;
@@ -219,15 +317,62 @@ saveBtn.addEventListener('click', () => {
   const content = memoInput.value.trim();
   if (!content) return;
   const starred = starToggle.getAttribute('aria-pressed') === 'true';
+  const images = [...editorImages];
 
-  if (editingId) {
-    updateMemo(editingId, { content, starred });
-  } else {
-    createMemo(content, starred);
+  const saved = editingId
+    ? updateMemo(editingId, { content, starred, images })
+    : createMemo(content, starred, images);
+
+  if (!saved) {
+    showToast('저장 공간이 부족해 메모를 저장하지 못했습니다.');
+    return;
   }
 
   resetEditor();
   renderList();
+});
+
+// ===== 이미지 추가 메뉴 (갤러리 / 카메라 선택) =====
+function closeImageAddMenu() {
+  imageAddMenu.hidden = true;
+  imageAddBtn.setAttribute('aria-expanded', 'false');
+}
+
+imageAddBtn.addEventListener('click', (event) => {
+  event.stopPropagation();
+  const isOpen = !imageAddMenu.hidden;
+  if (isOpen) {
+    closeImageAddMenu();
+  } else {
+    imageAddMenu.hidden = false;
+    imageAddBtn.setAttribute('aria-expanded', 'true');
+  }
+});
+
+document.addEventListener('click', (event) => {
+  if (imageAddMenu.hidden) return;
+  if (imageAddMenu.contains(event.target) || event.target === imageAddBtn) return;
+  closeImageAddMenu();
+});
+
+imageGalleryBtn.addEventListener('click', () => {
+  closeImageAddMenu();
+  imageGalleryInput.click();
+});
+
+imageCameraBtn.addEventListener('click', () => {
+  closeImageAddMenu();
+  imageCameraInput.click();
+});
+
+imageGalleryInput.addEventListener('change', () => {
+  addImageFile(imageGalleryInput.files[0]);
+  imageGalleryInput.value = '';
+});
+
+imageCameraInput.addEventListener('change', () => {
+  addImageFile(imageCameraInput.files[0]);
+  imageCameraInput.value = '';
 });
 
 searchInput.addEventListener('input', renderList);
