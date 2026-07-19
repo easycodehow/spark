@@ -660,23 +660,34 @@ body {
 
 .detail-action-btn {
   flex: 1;
-  height: 36px;
+  height: auto;
+  padding: 10px 4px;
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   border: 1px solid var(--color-text-muted);
   background: transparent;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 12px;
   font-family: inherit;
   color: var(--color-text-body);
   cursor: pointer;
 }
 
 .detail-action-icon {
-  font-size: 14px;
-  line-height: 1;
+  display: inline-flex;
+  color: var(--color-text-muted);
+}
+
+.detail-action-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+[data-theme="dark"] .detail-action-icon {
+  color: var(--color-text-muted-dark);
 }
 
 [data-theme="dark"] .detail-action-btn {
