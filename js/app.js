@@ -48,8 +48,6 @@ const detailDeleteBtn = document.getElementById('detail-delete-btn');
 const detailImages = document.getElementById('detail-images');
 
 const imageAddBtn = document.getElementById('image-add-btn');
-const imageAddMenu = document.getElementById('image-add-menu');
-const imageGalleryBtn = document.getElementById('image-gallery-btn');
 const imageCameraBtn = document.getElementById('image-camera-btn');
 const imageGalleryInput = document.getElementById('image-gallery-input');
 const imageCameraInput = document.getElementById('image-camera-input');
@@ -332,36 +330,12 @@ saveBtn.addEventListener('click', () => {
   renderList();
 });
 
-// ===== 이미지 추가 메뉴 (갤러리 / 카메라 선택) =====
-function closeImageAddMenu() {
-  imageAddMenu.hidden = true;
-  imageAddBtn.setAttribute('aria-expanded', 'false');
-}
-
-imageAddBtn.addEventListener('click', (event) => {
-  event.stopPropagation();
-  const isOpen = !imageAddMenu.hidden;
-  if (isOpen) {
-    closeImageAddMenu();
-  } else {
-    imageAddMenu.hidden = false;
-    imageAddBtn.setAttribute('aria-expanded', 'true');
-  }
-});
-
-document.addEventListener('click', (event) => {
-  if (imageAddMenu.hidden) return;
-  if (imageAddMenu.contains(event.target) || event.target === imageAddBtn) return;
-  closeImageAddMenu();
-});
-
-imageGalleryBtn.addEventListener('click', () => {
-  closeImageAddMenu();
+// ===== 이미지 추가 (갤러리) / 카메라 촬영 =====
+imageAddBtn.addEventListener('click', () => {
   imageGalleryInput.click();
 });
 
 imageCameraBtn.addEventListener('click', () => {
-  closeImageAddMenu();
   imageCameraInput.click();
 });
 

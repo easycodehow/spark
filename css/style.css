@@ -330,49 +330,11 @@ body {
   margin-top: 12px;
 }
 
-/* 이미지 추가 버튼을 먼저 배치하고 나머지 버튼은 오른쪽 끝으로 정렬 */
-.image-add-wrapper {
-  position: relative;
-  margin-right: auto;
-}
-
-.image-add-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 4px;
-  min-width: 168px;
-  background-color: #FFFFFF;
-  border: 1px solid rgba(192, 57, 43, 0.4);
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+/* 이미지 추가 / 카메라 버튼을 먼저 배치하고 나머지 버튼은 오른쪽 끝으로 정렬 */
+.editor-image-buttons {
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  z-index: 10;
-}
-
-[data-theme="dark"] .image-add-menu {
-  background-color: var(--color-header-dark);
-}
-
-.image-add-menu-item {
-  border: none;
-  background: transparent;
-  text-align: left;
-  padding: 12px 16px;
-  font-size: 15px;
-  font-family: inherit;
-  color: var(--color-text-title);
-  cursor: pointer;
-}
-
-.image-add-menu-item:not(:last-child) {
-  border-bottom: 1px solid rgba(191, 181, 163, 0.3);
-}
-
-[data-theme="dark"] .image-add-menu-item {
-  color: var(--color-text-title-dark);
+  gap: 4px;
+  margin-right: auto;
 }
 
 /* 에디터 첨부 이미지 미리보기 */
