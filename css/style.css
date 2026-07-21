@@ -518,6 +518,45 @@ body {
   color: var(--color-text-muted-dark);
 }
 
+/* 폴더 탭 */
+.folder-tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+  padding-bottom: 2px;
+}
+
+.folder-tab {
+  flex: none;
+  border: 1px solid rgba(192, 57, 43, 0.4);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: calc(14px * var(--font-scale));
+  font-family: inherit;
+  color: var(--color-text-body);
+  background-color: #FFFFFF;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.folder-tab.active {
+  background-color: var(--color-point);
+  border-color: var(--color-point);
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .folder-tab {
+  background-color: var(--color-header-dark);
+  color: var(--color-text-body-dark);
+}
+
+[data-theme="dark"] .folder-tab.active {
+  background-color: var(--color-point-dark);
+  border-color: var(--color-point-dark);
+  color: var(--color-header-dark);
+}
+
 /* 메모 목록 */
 .memo-list-section {
   display: flex;

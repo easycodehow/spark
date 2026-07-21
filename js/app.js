@@ -12,6 +12,10 @@ const STORAGE_QUOTA_BYTES = 5 * 1024 * 1024;
 let editingId = null;
 let showStarredOnly = false;
 let editorImages = [];
+let activeFolder = 'ALL'; // 'ALL' | 'UNCLASSIFIED' | 실제 폴더명
+
+// 메모 첫 줄이 "폴더명/" 형식(슬래시나 공백 없는 이름 + 슬래시 하나)이면 폴더로 인식
+const FOLDER_LINE_PATTERN = /^([^\s/]+)\/$/;
 
 // ===== DOM 참조 =====
 const memoInput = document.getElementById('memo-input');
@@ -19,6 +23,7 @@ const starToggle = document.getElementById('star-toggle');
 const saveBtn = document.getElementById('save-btn');
 const searchInput = document.getElementById('search-input');
 const filterToggle = document.getElementById('filter-toggle');
+const folderTabs = document.getElementById('folder-tabs');
 const memoList = document.getElementById('memo-list');
 const emptyMessage = document.getElementById('empty-message');
 
@@ -100,13 +105,20 @@ function generateId() {
   });
 }
 
+// ===== 폴더 =====
+function extractFolder(content) {
+  const firstLine = content.split('\n')[0].trim();
+  const match = firstLine.match(FOLDER_LINE_PATTERN);
+  return match ? match[1] : null;
+}
+
 // ===== CRUD =====
-function createMemo(content, starred, images) {
+function createMemo(content, starred, images, folder) {
   const now = new Date().toISOString();
   const memo = {
     id: generateId(),
     content,
-    folder: null,
+    folder: folder || null,
     starred,
     images,
     createdAt: now,
@@ -333,6 +345,7 @@ function openDetail(memo) {
 
   memoEditorSection.hidden = true;
   memoToolbar.hidden = true;
+  folderTabs.hidden = true;
   memoListSection.hidden = true;
   detailView.hidden = false;
 }
@@ -342,6 +355,7 @@ function closeDetail() {
   detailView.hidden = true;
   memoEditorSection.hidden = false;
   memoToolbar.hidden = false;
+  renderFolderTabs();
   memoListSection.hidden = false;
 }
 
@@ -357,17 +371,101 @@ function formatDate(isoString) {
 }
 
 function getMemoTitle(memo) {
-  const firstLine = memo.content.split('\n')[0].trim();
+  const lines = memo.content.split('\n');
+  const hasFolderLine = FOLDER_LINE_PATTERN.test(lines[0].trim());
+  const previewLines = hasFolderLine ? lines.slice(1) : lines;
+  const firstLine = (previewLines[0] || '').trim();
   if (firstLine) return firstLine;
   if (memo.images.length > 0) return `[이미지] ${formatDate(memo.updatedAt)}`;
   return '(내용 없음)';
 }
 
+// ===== 폴더 탭 =====
+function renderFolderTabs() {
+  const folders = [...new Set(getMemos().map((memo) => memo.folder).filter(Boolean))].sort((a, b) =>
+    a.localeCompare(b, 'ko')
+  );
+
+  if (folders.length === 0) {
+    activeFolder = 'ALL';
+    folderTabs.hidden = true;
+    folderTabs.innerHTML = '';
+    return;
+  }
+
+  folderTabs.hidden = false;
+  folderTabs.innerHTML = '';
+
+  const tabs = [
+    { key: 'ALL', label: '전체', deletable: false },
+    { key: 'UNCLASSIFIED', label: '미분류', deletable: false },
+    ...folders.map((name) => ({ key: name, label: name, deletable: true })),
+  ];
+
+  tabs.forEach((tab) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'folder-tab' + (activeFolder === tab.key ? ' active' : '');
+    btn.textContent = tab.label;
+
+    btn.addEventListener('click', () => {
+      activeFolder = tab.key;
+      renderList();
+    });
+
+    if (tab.deletable) {
+      let pressTimer = null;
+      const startPress = () => {
+        pressTimer = setTimeout(() => {
+          pressTimer = null;
+          if (confirm(`'${tab.label}' 폴더를 삭제할까요? 폴더 안의 메모는 미분류로 이동합니다.`)) {
+            deleteFolder(tab.label);
+          }
+        }, 600);
+      };
+      const cancelPress = () => {
+        if (pressTimer) {
+          clearTimeout(pressTimer);
+          pressTimer = null;
+        }
+      };
+      btn.addEventListener('pointerdown', startPress);
+      btn.addEventListener('pointerup', cancelPress);
+      btn.addEventListener('pointerleave', cancelPress);
+      btn.addEventListener('pointercancel', cancelPress);
+    }
+
+    folderTabs.appendChild(btn);
+  });
+}
+
+function deleteFolder(folderName) {
+  const memos = getMemos();
+  memos.forEach((memo) => {
+    if (memo.folder === folderName) {
+      memo.folder = null;
+      memo.updatedAt = new Date().toISOString();
+    }
+  });
+  setMemos(memos);
+  if (activeFolder === folderName) {
+    activeFolder = 'ALL';
+  }
+  renderList();
+}
+
 function renderList() {
+  renderFolderTabs();
+
   const keyword = searchInput.value.trim().toLowerCase();
   const memos = getMemos()
     .filter((memo) => !showStarredOnly || memo.starred)
     .filter((memo) => memo.content.toLowerCase().includes(keyword))
+    .filter((memo) => {
+      if (activeFolder === 'ALL') return true;
+      if (activeFolder === 'UNCLASSIFIED') return !memo.folder;
+      return memo.folder === activeFolder;
+    })
     .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
 
   memoList.innerHTML = '';
@@ -427,10 +525,11 @@ saveBtn.addEventListener('click', () => {
     return;
   }
   const starred = starToggle.getAttribute('aria-pressed') === 'true';
+  const folder = extractFolder(content);
 
   const saved = editingId
-    ? updateMemo(editingId, { content, starred, images })
-    : createMemo(content, starred, images);
+    ? updateMemo(editingId, { content, starred, images, folder })
+    : createMemo(content, starred, images, folder);
 
   if (!saved) {
     showToast('저장 공간이 부족해 메모를 저장하지 못했습니다.');

@@ -1,7 +1,7 @@
 // spark 서비스 워커 — 오프라인 캐싱 담당
 
 // 배포마다 캐시를 새로 채우기 위한 버전 이름 (파일 목록이 바뀌면 이 값을 올릴 것)
-const CACHE_NAME = 'spark-cache-v15';
+const CACHE_NAME = 'spark-cache-v16';
 
 // 오프라인에서도 앱이 뜨는 데 필요한 핵심 파일 목록
 const CACHE_FILES = [
