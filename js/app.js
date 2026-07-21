@@ -130,6 +130,14 @@ function deleteMemo(id) {
   setMemos(memos);
 }
 
+// ===== 햅틱 피드백 =====
+// navigator.vibrate 미지원 브라우저(예: iOS Safari)에서는 조용히 무시됨
+function vibrate(pattern) {
+  if (navigator.vibrate) {
+    navigator.vibrate(pattern);
+  }
+}
+
 // ===== 편집기 상태 =====
 
 // 입력한 줄 수만큼 textarea 높이를 자동으로 늘림 (최대 높이는 CSS max-height가 제한, 그 이상은 내부 스크롤)
@@ -396,6 +404,7 @@ saveBtn.addEventListener('click', () => {
     return;
   }
 
+  vibrate(100);
   resetEditor();
   renderList();
 });
@@ -621,6 +630,7 @@ detailDeleteBtn.addEventListener('click', () => {
   if (!confirm('이 메모를 삭제할까요?')) return;
   if (editingId === detailMemoId) resetEditor();
   deleteMemo(detailMemoId);
+  vibrate([100, 50, 100]);
   closeDetail();
   renderList();
 });
