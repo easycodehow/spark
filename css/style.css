@@ -434,6 +434,21 @@ body {
   color: var(--color-point-dark);
 }
 
+.icon-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* 음성 메모 녹음 중 아이콘 깜빡임 */
+#mic-btn[aria-pressed="true"] {
+  animation: mic-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes mic-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
 #star-toggle,
 #filter-toggle {
   border: 1.5px solid var(--color-point);

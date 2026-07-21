@@ -59,6 +59,9 @@ const imageGalleryInput = document.getElementById('image-gallery-input');
 const imageCameraInput = document.getElementById('image-camera-input');
 const editorImagePreview = document.getElementById('editor-image-preview');
 
+const micBtn = document.getElementById('mic-btn');
+const micCancelBtn = document.getElementById('mic-cancel-btn');
+
 let detailMemoId = null;
 
 // ===== LocalStorage 입출력 =====
@@ -188,6 +191,7 @@ function resetEditor() {
   starToggle.setAttribute('aria-pressed', 'false');
   editorImages = [];
   renderEditorImagePreview();
+  stopRecording();
 }
 
 function loadMemoIntoEditor(memo) {
@@ -560,6 +564,114 @@ imageCameraInput.addEventListener('change', () => {
   addImageFile(imageCameraInput.files[0]);
   imageCameraInput.value = '';
 });
+
+// ===== 음성 메모 (Web Speech API, A안 - 음성을 텍스트로 변환) =====
+const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+let recognition = null;
+let isRecording = false;
+let recordInsertPos = 0;
+let recordStartValue = '';
+
+function setMicUiRecording(recording) {
+  isRecording = recording;
+  micBtn.setAttribute('aria-pressed', String(recording));
+  micBtn.setAttribute('aria-label', recording ? '음성 메모 중지' : '음성 메모 시작');
+  micCancelBtn.hidden = !recording;
+}
+
+function insertTextAtCursor(text) {
+  const value = memoInput.value;
+  const pos = recordInsertPos;
+  memoInput.value = value.slice(0, pos) + text + value.slice(pos);
+  recordInsertPos = pos + text.length;
+  memoInput.selectionStart = memoInput.selectionEnd = recordInsertPos;
+  autoGrowMemoInput();
+}
+
+function createRecognition() {
+  const rec = new SpeechRecognitionCtor();
+  rec.lang = 'ko-KR';
+  rec.continuous = true;
+  rec.interimResults = false;
+
+  rec.addEventListener('result', (event) => {
+    let finalText = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        finalText += event.results[i][0].transcript;
+      }
+    }
+    if (finalText) {
+      insertTextAtCursor(finalText);
+    }
+  });
+
+  rec.addEventListener('error', (event) => {
+    if (event.error === 'aborted' || event.error === 'no-speech') return;
+    showToast('음성 인식 중 오류가 발생했습니다.');
+    stopRecording();
+  });
+
+  // 무음 등으로 인식이 자동 종료되어도, 사용자가 아직 녹음 중이라면 이어서 재시작한다
+  rec.addEventListener('end', () => {
+    if (isRecording) {
+      try {
+        rec.start();
+      } catch (err) {
+        // 이미 시작된 상태 등은 무시
+      }
+    }
+  });
+
+  return rec;
+}
+
+function startRecording() {
+  if (!SpeechRecognitionCtor || isRecording) return;
+  recordStartValue = memoInput.value;
+  recordInsertPos = memoInput.selectionStart;
+  recognition = createRecognition();
+  try {
+    recognition.start();
+  } catch (err) {
+    showToast('음성 인식을 시작할 수 없습니다.');
+    return;
+  }
+  setMicUiRecording(true);
+}
+
+function stopRecording() {
+  // isRecording을 먼저 false로 바꿔야, stop()이 유발하는 'end' 이벤트의 자동 재시작 로직이
+  // 사용자가 직접 멈춘 것과 무음 타임아웃으로 끊긴 것을 올바르게 구분할 수 있다
+  setMicUiRecording(false);
+  if (recognition) {
+    recognition.stop();
+    recognition = null;
+  }
+}
+
+function cancelRecording() {
+  memoInput.value = recordStartValue;
+  autoGrowMemoInput();
+  stopRecording();
+}
+
+if (!SpeechRecognitionCtor) {
+  micBtn.disabled = true;
+  micBtn.setAttribute('aria-label', '이 브라우저는 음성 인식을 지원하지 않습니다');
+  micBtn.title = '이 브라우저는 음성 인식을 지원하지 않습니다';
+}
+
+micBtn.addEventListener('click', () => {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+});
+
+micCancelBtn.addEventListener('click', cancelRecording);
 
 searchInput.addEventListener('input', renderList);
 
