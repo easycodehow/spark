@@ -138,6 +138,29 @@ function vibrate(pattern) {
   }
 }
 
+// ===== 화면 꺼짐 방지 (Wake Lock) =====
+// navigator.wakeLock 미지원 브라우저에서는 조용히 무시됨
+let wakeLock = null;
+
+async function requestWakeLock() {
+  if (!navigator.wakeLock || wakeLock) return;
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    wakeLock.addEventListener('release', () => {
+      wakeLock = null;
+    });
+  } catch (err) {
+    // 권한 거부, 탭이 백그라운드인 상태 등에서 요청이 실패할 수 있음 — 무시
+  }
+}
+
+function releaseWakeLock() {
+  if (wakeLock) {
+    wakeLock.release();
+    wakeLock = null;
+  }
+}
+
 // ===== 편집기 상태 =====
 
 // 입력한 줄 수만큼 textarea 높이를 자동으로 늘림 (최대 높이는 CSS max-height가 제한, 그 이상은 내부 스크롤)
@@ -166,6 +189,16 @@ function loadMemoIntoEditor(memo) {
 }
 
 memoInput.addEventListener('input', autoGrowMemoInput);
+memoInput.addEventListener('focus', requestWakeLock);
+memoInput.addEventListener('blur', releaseWakeLock);
+
+// Wake Lock은 탭이 백그라운드로 가면 브라우저가 자동으로 해제하므로,
+// 입력창에 계속 포커스가 남아있는 상태로 화면에 복귀하면 다시 요청한다.
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && document.activeElement === memoInput) {
+    requestWakeLock();
+  }
+});
 
 // ===== 이미지 첨부 =====
 function renderEditorImagePreview() {
@@ -405,6 +438,7 @@ saveBtn.addEventListener('click', () => {
   }
 
   vibrate(100);
+  releaseWakeLock();
   resetEditor();
   renderList();
 });
