@@ -266,18 +266,7 @@ async function createThumbnail(file) {
   return canvas.toDataURL('image/jpeg', THUMBNAIL_QUALITY);
 }
 
-// 촬영한 사진 원본을 폰에 확실히 남기기 위해 공유 시트를 띄운다 (사용자가 "이미지 저장" 등을 직접 선택).
-// 파일 공유를 지원하지 않는 브라우저에서는 다운로드로 대체한다.
-async function shareOrDownloadPhoto(file) {
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      await navigator.share({ files: [file], title: '사진 저장' });
-    } catch (err) {
-      // 사용자가 공유를 취소한 경우 등은 무시
-    }
-    return;
-  }
-
+function downloadPhoto(file) {
   const url = URL.createObjectURL(file);
   const a = document.createElement('a');
   a.href = url;
@@ -286,6 +275,23 @@ async function shareOrDownloadPhoto(file) {
   a.click();
   document.body.removeChild(a);
   setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+// 촬영한 사진 원본을 폰에 확실히 남기기 위해 공유 시트를 띄운다 (사용자가 "이미지 저장" 등을 직접 선택).
+// 카메라 앱을 열고 촬영하는 데 시간이 걸려 사용자 제스처가 만료되면 navigator.share()가 조용히
+// 실패할 수 있는데, 이 경우(사용자가 직접 취소한 AbortError가 아닌 모든 실패)는 다운로드로 대체해
+// 사진이 유실되지 않게 한다.
+async function shareOrDownloadPhoto(file) {
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: '사진 저장' });
+      return;
+    } catch (err) {
+      if (err && err.name === 'AbortError') return; // 사용자가 공유 시트에서 직접 취소한 경우는 존중
+    }
+  }
+
+  downloadPhoto(file);
 }
 
 // ===== 상세보기 =====
