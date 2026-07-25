@@ -63,7 +63,7 @@
 ## 기술 스택
 - Frontend: HTML5, CSS3, Vanilla JavaScript
 - PWA: Service Worker, Web App Manifest
-- Storage: LocalStorage (메모 저장)
+- Storage: LocalStorage (메모 텍스트/메타데이터 저장), IndexedDB (첨부 이미지 원본 저장, 2026-07-25부터) — LocalStorage 용량 제한(5~10MB) 문제로 이미지만 IndexedDB로 분리
 - Backup: JSON 파일 내보내기/가져오기
 - 배포: Vercel
 - 버전관리: GitHub
@@ -174,7 +174,7 @@
 | `content` | string | 메모 본문 전체 |
 | `folder` | string \| null | 폴더명 (없으면 null = 미분류) |
 | `starred` | boolean | 중요 메모 여부 |
-| `images` | array | Base64 이미지 배열 (초기값 []) |
+| `images` | array | 이미지 참조 id 배열 (초기값 []). 실제 이미지 원본(base64)은 IndexedDB(`spark-images`)에 저장하고, 이 배열에는 그 id만 담는다. **단, JSON 내보내기(Export) 파일 안에서는 백업의 자체 완결성을 위해 항상 base64 원본으로 풀어서 저장** (2026-07-25부터, 이전엔 이 배열에 base64를 직접 담았음) |
 | `createdAt` | ISO8601 | 생성 시각 |
 | `updatedAt` | ISO8601 | 마지막 수정 시각 |
 
@@ -301,9 +301,9 @@
 - [x] 이미지 추가 버튼 (이미지 추가=갤러리, 카메라=바로 촬영, 별도 버튼 2개) (2026-07-19)
 - [x] FileReader로 이미지 → Base64 변환 (2026-07-19)
 - [x] **이미지 용량 제한: 1장당 최대 500KB** (초과 시 캔버스로 자동 압축 후 첨부, 압축해도 초과하면 토스트 경고) (2026-07-19)
-- [x] **저장 전 LocalStorage 잔여 용량 체크** (부족 시 경고) (2026-07-19)
+- [x] ~~저장 전 LocalStorage 잔여 용량 체크~~ (2026-07-19) → 2026-07-25 IndexedDB 이전으로 항목 자체가 불필요해져 제거됨 (아래 참고)
 - [x] 에디터 이미지 미리보기 + 삭제 버튼 (2026-07-19)
-- [x] LocalStorage에 Base64로 저장 (`images` 배열에 추가) (2026-07-19)
+- [x] Base64로 저장 (`images` 배열에 추가) (2026-07-19) — **2026-07-25: 저장 위치를 LocalStorage → IndexedDB로 이전.** LocalStorage 5~10MB 한도를 이미지가 금방 채워 "저장 공간 부족" 오류가 잦았던 문제 해결. `images` 배열은 이제 base64 대신 IndexedDB 참조 id를 담음 (`js/image-store.js` 신설, 기존 사용자 데이터는 앱 최초 실행 시 자동 마이그레이션)
 - [x] 상세보기 화면에 첨부 이미지 표시 (2026-07-19)
 
 ---

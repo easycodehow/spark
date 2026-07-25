@@ -1102,3 +1102,40 @@
 ### 다음 작업 제안
 - 정해진 로드맵 항목은 모두 끝난 상태, 다음 요청 대기
 - 진행 시 "시작" 또는 "go" 지시 필요 (CLAUDE.md 승인 원칙에 따름)
+
+---
+
+## 2026-07-25 (로드맵 완료 후 수정 2 - 이미지 저장소를 IndexedDB로 이전)
+
+### 진행 상황
+- **배경**: 카메라로 찍은 사진을 저장할 때 "저장 공간이 부족해 이미지를 추가할 수 없습니다" 오류가 나온다는 문의 → 원인은 폰 저장공간이 아니라 이 앱이 쓰는 브라우저 LocalStorage의 고정 한도(보수적으로 5MB로 잡아둠)였고, 이미지를 Base64로 변환해 저장하다 보니 금방 한도에 도달하는 구조적 문제였음
+- **해결**: 이미지 저장소를 LocalStorage → **IndexedDB**로 이전 (텍스트 메모는 계속 LocalStorage 사용)
+  - **새 파일 `js/image-store.js`**: IndexedDB(`spark-images` DB, `images` 스토어)에 이미지 base64를 저장/조회/삭제하는 헬퍼(`saveImage`/`getImage`/`getImages`/`deleteImage`/`deleteImages`) 구현
+  - **`js/app.js`**
+    - 메모의 `images` 필드가 이제 base64 원본 대신 IndexedDB 참조 id 배열을 담음
+    - `editorImages`를 `{id, base64}` 형태로 변경, 편집기 미리보기/`addImageFile`/`loadMemoIntoEditor`(새로 만든 `loadEditorImagesFromIds`로 id→base64 조회) 반영
+    - `openDetail`을 비동기로 바꿔 id로 실제 이미지를 조회해 표시 (화면 전환은 먼저 하고 이미지만 비동기로 채워 넣어 딜레이 체감 최소화, 연타 시 최신 메모가 아니면 렌더링 무시하는 가드 추가)
+    - 저장(`saveBtn`) 시: 기존 이미지(id 있음)는 재사용, 새로 추가된 이미지(id 없음)만 IndexedDB에 새로 씀. 편집 중 삭제된 기존 이미지는 저장 성공 후 IndexedDB에서도 함께 정리(고아 데이터 방지)
+    - `deleteMemo`: 메모 삭제 시 연결된 이미지도 IndexedDB에서 함께 삭제
+    - 내보내기(Export): 백업 파일이 계속 자체 완결적이도록 JSON 안에는 id 대신 실제 base64를 그대로 인라인
+    - 가져오기(Import): 백업 파일의 base64 이미지를 IndexedDB에 새로 쓰고 새 id를 발급(충돌 방지)
+    - **레거시 마이그레이션**: 예전 버전(LocalStorage에 base64 직접 저장)을 쓰던 사용자를 위해, 앱 최초 실행 시 1회성으로 기존 base64 이미지를 자동으로 IndexedDB로 옮기는 `migrateLegacyImagesToIndexedDb()` 추가 (완료 플래그 `spark-images-migrated-v1`, 일부 실패 시 플래그를 세우지 않아 다음 실행 때 재시도)
+    - 더 이상 쓰이지 않게 된 `estimateStorageUsageBytes`/`hasStorageRoomFor`/`STORAGE_QUOTA_BYTES`(LocalStorage 5MB 용량 체크용) 삭제
+    - 이미지 1장당 500KB 압축 제한(5단계에서 이미 완료된 기능)은 그대로 유지 — 이번 변경은 "어디에 저장하느냐"만 바꾼 것
+  - **`index.html`**: `js/image-store.js` `<script>` 태그를 `app.js`보다 먼저 로드하도록 추가
+  - **`sw.js`**: 캐시 파일 목록에 `image-store.js` 추가, 캐시 버전 `v18` → `v19` 상향
+  - **`CLAUDE.md`**: "기술 스택"의 Storage 항목에 IndexedDB 추가, "메모 데이터 구조"의 `images` 필드 설명을 참조 id 기반으로 수정, 5단계 체크리스트에 이전 사실과 날짜 기록(체크 해제 없이 각주 형태로 추가)
+- **자동화 1차 검증**: 헤드리스 크롬(CDP) + 실제 IndexedDB로 총 15개 시나리오 전부 통과
+  - 이미지 첨부 후 저장 → LocalStorage에는 참조 id만 남고 IndexedDB에 실제 base64가 저장됨, LocalStorage 원문 크기가 작게 유지됨
+  - 상세보기에서 이미지가 실제로 렌더링됨
+  - 편집 중 이미지 삭제 후 저장 → IndexedDB에서도 해당 이미지가 정리됨
+  - 메모 자체를 삭제 → 연결된 IndexedDB 이미지도 함께 삭제됨
+  - 내보내기 데이터의 `images`가 base64로 인라인됨
+  - 가져오기 시 base64가 IndexedDB에 새로 저장되고 메모에는 새 id가 반영됨
+  - 레거시(예전 방식 base64) 데이터를 심어두고 재실행 → 자동으로 id로 교체되고 IndexedDB에 옮겨지며 완료 플래그가 세팅됨
+  - 테스트 중 겪은 해프닝: 테스트 스크립트가 이전 실행에서 닫지 않고 남긴 브라우저 탭이 IndexedDB 연결을 붙잡고 있어 `deleteDatabase()` 호출이 멈추는 테스트 절차상의 문제를 발견 → 앱 코드 문제 아님, 잔여 탭을 정리하고 재실행해 정상 통과 확인. 이후 테스트용 크롬 프로세스(사용자의 일반 브라우저와 명확히 구분해 커맨드라인 확인 후 처리)와 로컬 서버 프로세스, 임시 스크립트 모두 정리 완료
+
+### 다음 작업 제안
+- 커밋·푸시·배포 후 **2차 확인 필요**: 실기기에서 (1) 카메라/갤러리로 사진 첨부 후 저장이 정상 동작하는지, (2) 상세보기에서 사진이 잘 보이는지, (3) 예전에 저장해둔 메모(사진 포함)가 있다면 앱 재실행 후에도 사진이 그대로 잘 보이는지(자동 마이그레이션 확인), (4) 내보내기한 백업 파일을 다시 가져오기 했을 때 사진이 살아있는지
+- 2차 확인 전까지 다른 기능/수정 작업으로 넘어가지 않음
+- 진행 시 "시작" 또는 "go" 지시 필요 (CLAUDE.md 승인 원칙에 따름)

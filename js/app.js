@@ -6,8 +6,8 @@ const FONT_SIZES = ['xs', 's', 'm', 'l', 'xl'];
 const THEME_KEY = 'spark-theme';
 const THEME_COLOR = { light: '#1E3A5F', dark: '#101014' };
 const IMAGE_MAX_BYTES = 500 * 1024;
-// 브라우저별로 LocalStorage 실제 한도가 다르지만(대부분 5MB 내외), 보수적으로 5MB를 기준 용량으로 삼는다.
-const STORAGE_QUOTA_BYTES = 5 * 1024 * 1024;
+// 마이그레이션(기존 base64 이미지 → IndexedDB 참조 id) 완료 여부 플래그
+const IMAGE_MIGRATION_KEY = 'spark-images-migrated-v1';
 
 let editingId = null;
 let showStarredOnly = false;
@@ -79,21 +79,6 @@ function setMemos(memos) {
   }
 }
 
-// ===== LocalStorage 용량 체크 =====
-function estimateStorageUsageBytes() {
-  let total = 0;
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    const value = localStorage.getItem(key) || '';
-    total += (key.length + value.length) * 2; // UTF-16 기준 대략치
-  }
-  return total;
-}
-
-function hasStorageRoomFor(additionalBytes) {
-  return estimateStorageUsageBytes() + additionalBytes < STORAGE_QUOTA_BYTES;
-}
-
 // ===== ID 생성 =====
 // crypto.randomUUID()는 보안 컨텍스트(HTTPS/localhost)에서만 지원되므로,
 // 미지원 환경(예: 같은 네트워크의 다른 기기에서 로컬 IP로 접속하는 경우)을 위한 대체 로직을 둔다.
@@ -141,8 +126,12 @@ function updateMemo(id, changes) {
 }
 
 function deleteMemo(id) {
-  const memos = getMemos().filter((memo) => memo.id !== id);
-  setMemos(memos);
+  const memos = getMemos();
+  const target = memos.find((memo) => memo.id === id);
+  setMemos(memos.filter((memo) => memo.id !== id));
+  if (target && target.images.length > 0) {
+    deleteImages(target.images).catch(() => {});
+  }
 }
 
 // ===== 햅틱 피드백 =====
@@ -194,12 +183,24 @@ function resetEditor() {
   stopRecording();
 }
 
-function loadMemoIntoEditor(memo) {
+// 저장된 이미지 참조 id 배열을 실제 base64와 함께 편집기 상태로 불러온다.
+// (없는 항목은 건너뜀 — IndexedDB에서 지워졌거나 손상된 경우에 대한 방어적 처리)
+async function loadEditorImagesFromIds(ids) {
+  const pairs = await Promise.all(
+    ids.map(async (id) => {
+      const base64 = await getImage(id);
+      return base64 ? { id, base64 } : null;
+    })
+  );
+  return pairs.filter(Boolean);
+}
+
+async function loadMemoIntoEditor(memo) {
   editingId = memo.id;
   memoInput.value = memo.content;
   autoGrowMemoInput();
   starToggle.setAttribute('aria-pressed', String(memo.starred));
-  editorImages = [...memo.images];
+  editorImages = await loadEditorImagesFromIds(memo.images);
   renderEditorImagePreview();
   memoInput.focus();
 }
@@ -219,12 +220,12 @@ document.addEventListener('visibilitychange', () => {
 // ===== 이미지 첨부 =====
 function renderEditorImagePreview() {
   editorImagePreview.innerHTML = '';
-  editorImages.forEach((base64, index) => {
+  editorImages.forEach((item, index) => {
     const thumb = document.createElement('div');
     thumb.className = 'editor-image-thumb';
 
     const img = document.createElement('img');
-    img.src = base64;
+    img.src = item.base64;
     img.alt = `첨부 이미지 ${index + 1}`;
 
     const removeBtn = document.createElement('button');
@@ -324,34 +325,32 @@ async function addImageFile(file) {
     }
   }
 
-  if (!hasStorageRoomFor(base64.length * 2)) {
-    showToast('저장 공간이 부족해 이미지를 추가할 수 없습니다.');
-    return;
-  }
-
-  editorImages.push(base64);
+  editorImages.push({ id: null, base64 });
   renderEditorImagePreview();
 }
 
 // ===== 상세보기 =====
-function openDetail(memo) {
+async function openDetail(memo) {
   detailMemoId = memo.id;
   detailContent.textContent = memo.content;
   detailDate.textContent = `작성 ${formatDate(memo.createdAt)}  ·  수정 ${formatDate(memo.updatedAt)}`;
-
   detailImages.innerHTML = '';
-  memo.images.forEach((base64, index) => {
-    const img = document.createElement('img');
-    img.src = base64;
-    img.alt = `첨부 이미지 ${index + 1}`;
-    detailImages.appendChild(img);
-  });
 
   memoEditorSection.hidden = true;
   memoToolbar.hidden = true;
   folderTabs.hidden = true;
   memoListSection.hidden = true;
   detailView.hidden = false;
+
+  const base64List = await getImages(memo.images);
+  // 이미지 로딩 중 사용자가 다른 메모를 열었다면(연타 등) 이 결과는 더 이상 최신이 아니므로 무시
+  if (detailMemoId !== memo.id) return;
+  base64List.forEach((base64, index) => {
+    const img = document.createElement('img');
+    img.src = base64;
+    img.alt = `첨부 이미지 ${index + 1}`;
+    detailImages.appendChild(img);
+  });
 }
 
 function closeDetail() {
@@ -521,15 +520,28 @@ starToggle.addEventListener('click', () => {
   starToggle.setAttribute('aria-pressed', String(!pressed));
 });
 
-saveBtn.addEventListener('click', () => {
+saveBtn.addEventListener('click', async () => {
   const content = memoInput.value.trim();
-  const images = [...editorImages];
-  if (!content && images.length === 0) {
+  if (!content && editorImages.length === 0) {
     showToast('메모 내용이나 이미지를 추가해주세요.');
     return;
   }
   const starred = starToggle.getAttribute('aria-pressed') === 'true';
   const folder = extractFolder(content);
+
+  const previousMemo = editingId ? getMemos().find((memo) => memo.id === editingId) : null;
+  const previousImageIds = previousMemo ? previousMemo.images : [];
+
+  let images;
+  try {
+    // 기존 이미지(id 있음)는 그대로 재사용하고, 새로 추가된 이미지(id 없음)만 IndexedDB에 새로 쓴다
+    images = await Promise.all(
+      editorImages.map((item) => (item.id ? item.id : saveImage(item.base64)))
+    );
+  } catch (err) {
+    showToast('저장 공간이 부족해 이미지를 저장하지 못했습니다.');
+    return;
+  }
 
   const saved = editingId
     ? updateMemo(editingId, { content, starred, images, folder })
@@ -538,6 +550,12 @@ saveBtn.addEventListener('click', () => {
   if (!saved) {
     showToast('저장 공간이 부족해 메모를 저장하지 못했습니다.');
     return;
+  }
+
+  // 편집 중 제거된 기존 이미지는 IndexedDB에서도 함께 정리 (고아 데이터 방지)
+  const removedImageIds = previousImageIds.filter((id) => !images.includes(id));
+  if (removedImageIds.length > 0) {
+    deleteImages(removedImageIds).catch(() => {});
   }
 
   vibrate(100);
@@ -707,9 +725,13 @@ document.addEventListener('click', (event) => {
 });
 
 // ===== 메모 내보내기 =====
-function exportMemos() {
+async function exportMemos() {
   const memos = getMemos();
-  const json = JSON.stringify(memos, null, 2);
+  // 백업 파일은 계속 자체 완결적이도록, id 참조 대신 실제 base64를 그대로 담아 내보낸다
+  const memosWithImages = await Promise.all(
+    memos.map(async (memo) => ({ ...memo, images: await getImages(memo.images) }))
+  );
+  const json = JSON.stringify(memosWithImages, null, 2);
   const blob = new Blob([json], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
 
@@ -727,8 +749,8 @@ function exportMemos() {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-exportBtn.addEventListener('click', () => {
-  exportMemos();
+exportBtn.addEventListener('click', async () => {
+  await exportMemos();
   closeMoreMenu();
 });
 
@@ -765,7 +787,7 @@ function isValidMemo(memo) {
   );
 }
 
-function importMemos(parsed) {
+async function importMemos(parsed) {
   if (!Array.isArray(parsed) || parsed.length === 0 || !parsed.every(isValidMemo)) {
     showToast('올바른 메모 백업 파일이 아닙니다.');
     return;
@@ -776,14 +798,28 @@ function importMemos(parsed) {
   const newMemos = parsed.filter((memo) => !existingIds.has(memo.id));
   const duplicateCount = parsed.length - newMemos.length;
 
-  setMemos([...newMemos, ...existingMemos]);
+  let importedMemos;
+  try {
+    // 백업 파일 안의 base64 이미지를 IndexedDB에 새로 저장하고, 새 참조 id로 교체
+    importedMemos = await Promise.all(
+      newMemos.map(async (memo) => ({
+        ...memo,
+        images: await Promise.all(memo.images.map((base64) => saveImage(base64))),
+      }))
+    );
+  } catch (err) {
+    showToast('이미지를 저장하는 중 오류가 발생해 가져오기에 실패했습니다.');
+    return;
+  }
+
+  setMemos([...importedMemos, ...existingMemos]);
   renderList();
 
-  if (newMemos.length === 0) {
+  if (importedMemos.length === 0) {
     showToast('가져올 새 메모가 없습니다 (모두 중복).');
   } else {
     const suffix = duplicateCount > 0 ? ` (중복 ${duplicateCount}개 제외)` : '';
-    showToast(`메모 ${newMemos.length}개를 가져왔습니다.${suffix}`);
+    showToast(`메모 ${importedMemos.length}개를 가져왔습니다.${suffix}`);
   }
 }
 
@@ -865,11 +901,11 @@ loadTheme();
 
 detailBackBtn.addEventListener('click', closeDetail);
 
-detailEditBtn.addEventListener('click', () => {
+detailEditBtn.addEventListener('click', async () => {
   const memo = getMemos().find((item) => item.id === detailMemoId);
   if (!memo) return;
   closeDetail();
-  loadMemoIntoEditor(memo);
+  await loadMemoIntoEditor(memo);
 });
 
 detailDeleteBtn.addEventListener('click', () => {
@@ -934,5 +970,40 @@ window.addEventListener('appinstalled', () => {
   installBtn.hidden = true;
 });
 
+// ===== 기존 데이터 마이그레이션 (base64 이미지 → IndexedDB 참조 id) =====
+// 이 앱을 예전 버전(LocalStorage에 base64 그대로 저장)에서 쓰던 사용자를 위한 1회성 이전 작업.
+async function migrateLegacyImagesToIndexedDb() {
+  if (localStorage.getItem(IMAGE_MIGRATION_KEY) === '1') return;
+
+  const memos = getMemos();
+  let changed = false;
+  let hadFailure = false;
+
+  for (const memo of memos) {
+    const isLegacyBase64 =
+      Array.isArray(memo.images) &&
+      memo.images.length > 0 &&
+      memo.images.every((item) => typeof item === 'string' && item.startsWith('data:'));
+    if (!isLegacyBase64) continue;
+
+    try {
+      memo.images = await Promise.all(memo.images.map((base64) => saveImage(base64)));
+      changed = true;
+    } catch (err) {
+      // 이 메모는 마이그레이션에 실패했으므로 base64 그대로 두고, 완료 플래그도 세우지 않아 다음 앱 실행 때 다시 시도한다
+      hadFailure = true;
+    }
+  }
+
+  if (changed) {
+    setMemos(memos);
+  }
+  if (!hadFailure) {
+    localStorage.setItem(IMAGE_MIGRATION_KEY, '1');
+  }
+}
+
 // ===== 초기 렌더링 =====
-renderList();
+migrateLegacyImagesToIndexedDb()
+  .catch(() => {})
+  .finally(renderList);
