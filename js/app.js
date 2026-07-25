@@ -821,9 +821,12 @@ fontSizeIncreaseBtn.addEventListener('click', () => stepFontSize(1));
 loadFontSize();
 
 // ===== 다크모드 토글 =====
+// 버튼 글자 자체가 상태를 나타냄: 라이트모드일 땐 "다크모드"(누르면 다크로),
+// 다크모드일 땐 "라이트모드"(누르면 라이트로) — 별도 토글 표시(동그라미) 없이 글자로만 안내
 function applyTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
   darkModeBtn.setAttribute('aria-pressed', String(theme === 'dark'));
+  darkModeBtn.textContent = theme === 'dark' ? '라이트모드' : '다크모드';
   themeColorMeta.setAttribute('content', THEME_COLOR[theme]);
 }
 
