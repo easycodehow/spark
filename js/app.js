@@ -631,6 +631,8 @@ function startRecording() {
   if (!SpeechRecognitionCtor || isRecording) return;
   recordStartValue = memoInput.value;
   recordInsertPos = memoInput.selectionStart;
+  memoInput.focus();
+  memoInput.selectionStart = memoInput.selectionEnd = recordInsertPos;
   recognition = createRecognition();
   try {
     recognition.start();
