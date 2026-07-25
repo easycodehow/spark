@@ -349,6 +349,7 @@ body {
 
 .editor-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   align-items: center;
   gap: 8px;
@@ -365,12 +366,28 @@ body {
 .icon-btn {
   border: none;
   background: transparent;
-  font-size: 24px;
   color: var(--color-text-muted);
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.icon-btn-icon {
+  display: inline-flex;
+}
+
+.icon-btn-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.icon-btn-label {
+  font-size: 11px;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .icon-btn[aria-pressed="true"] {
@@ -400,33 +417,23 @@ body {
   50% { opacity: 0.4; }
 }
 
-#star-toggle,
-#filter-toggle {
+.icon-btn--star {
   border: 1.5px solid var(--color-point);
   color: var(--color-point);
-  font-size: 20px;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  padding: 6px 10px;
 }
 
-#star-toggle[aria-pressed="true"],
-#filter-toggle[aria-pressed="true"] {
+.icon-btn--star[aria-pressed="true"] {
   background-color: var(--color-point);
   color: #FFFFFF;
 }
 
-[data-theme="dark"] #star-toggle,
-[data-theme="dark"] #filter-toggle {
+[data-theme="dark"] .icon-btn--star {
   border-color: var(--color-point-dark);
   color: var(--color-point-dark);
 }
 
-[data-theme="dark"] #star-toggle[aria-pressed="true"],
-[data-theme="dark"] #filter-toggle[aria-pressed="true"] {
+[data-theme="dark"] .icon-btn--star[aria-pressed="true"] {
   background-color: var(--color-point-dark);
   color: var(--color-header-dark);
 }

@@ -58,11 +58,31 @@
 
       <div class="editor-actions">
         <div class="editor-image-buttons">
-          <button id="image-camera-btn" class="icon-btn" type="button" aria-label="사진 촬영">📷</button>
-          <button id="mic-btn" class="icon-btn" type="button" aria-label="음성 메모 시작" aria-pressed="false">🎤</button>
-          <button id="mic-cancel-btn" class="icon-btn" type="button" aria-label="음성 인식 취소" hidden>✕</button>
+          <button id="image-camera-btn" class="icon-btn" type="button" aria-label="사진 촬영">
+            <span class="icon-btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
+            </span>
+            <span class="icon-btn-label">촬영</span>
+          </button>
+          <button id="mic-btn" class="icon-btn" type="button" aria-label="음성 메모 시작" aria-pressed="false">
+            <span class="icon-btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+            </span>
+            <span class="icon-btn-label">음성</span>
+          </button>
+          <button id="mic-cancel-btn" class="icon-btn" type="button" aria-label="음성 인식 취소" hidden>
+            <span class="icon-btn-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </span>
+            <span class="icon-btn-label">취소</span>
+          </button>
         </div>
-        <button id="star-toggle" class="icon-btn" type="button" aria-label="중요 메모로 표시" aria-pressed="false">★</button>
+        <button id="star-toggle" class="icon-btn icon-btn--star" type="button" aria-label="중요 메모로 표시" aria-pressed="false">
+          <span class="icon-btn-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </span>
+          <span class="icon-btn-label">중요</span>
+        </button>
         <button id="save-btn" class="primary-btn" type="button">저장</button>
       </div>
     </section>
@@ -74,7 +94,12 @@
     <!-- 검색 & 필터 -->
     <section class="memo-toolbar">
       <input type="text" id="search-input" placeholder="메모 검색" />
-      <button id="filter-toggle" class="icon-btn" type="button" aria-label="중요 메모만 보기" aria-pressed="false">★</button>
+      <button id="filter-toggle" class="icon-btn icon-btn--star" type="button" aria-label="중요 메모만 보기" aria-pressed="false">
+        <span class="icon-btn-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </span>
+        <span class="icon-btn-label">중요만</span>
+      </button>
     </section>
 
     <!-- 폴더 탭 (폴더가 하나 이상 있을 때만 표시) -->
