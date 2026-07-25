@@ -466,10 +466,26 @@ body {
   50% { opacity: 0.4; }
 }
 
+/* 촬영/음성/취소 버튼: 은은한 테두리 + 저장 버튼과 동일한 크기의 라벨 */
+.icon-btn--outlined {
+  border: 1px solid var(--color-text-muted);
+}
+
+[data-theme="dark"] .icon-btn--outlined {
+  border-color: var(--color-text-muted-dark);
+}
+
+.icon-btn--outlined .icon-btn-label {
+  font-size: 16px;
+}
+
 .icon-btn--star {
   border: 1.5px solid var(--color-point);
   color: var(--color-point);
-  padding: 6px 10px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  justify-content: center;
 }
 
 .icon-btn--star[aria-pressed="true"] {
