@@ -483,9 +483,14 @@ body {
   border: 1.5px solid var(--color-point);
   color: var(--color-point);
   width: 36px;
-  height: 36px;
+  flex-shrink: 0;
   padding: 0;
   justify-content: center;
+}
+
+/* 에디터의 저장 버튼(고정 36px 높이)과 나란히 있으므로 동일하게 고정 */
+#star-toggle {
+  height: 36px;
 }
 
 .icon-btn--star[aria-pressed="true"] {
@@ -524,9 +529,10 @@ body {
 }
 
 /* 검색 & 필터 */
+/* align-items: stretch(기본값)로 필터 버튼 높이가 검색창의 실제 높이(글자크기 설정에 따라 변함)에 맞춰짐 */
 .memo-toolbar {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   gap: 8px;
   margin-bottom: 16px;
 }
