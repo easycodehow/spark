@@ -56,9 +56,6 @@
     <section class="memo-editor">
       <textarea id="memo-input" placeholder="메모를 입력하세요..." rows="6"></textarea>
 
-      <!-- 첨부 이미지 미리보기 -->
-      <div id="editor-image-preview" class="editor-image-preview"></div>
-
       <div class="editor-actions">
         <div class="editor-image-buttons">
           <button id="image-camera-btn" class="icon-btn" type="button" aria-label="사진 촬영">📷</button>
@@ -70,7 +67,8 @@
       </div>
     </section>
 
-    <!-- 이미지 선택용 숨김 파일 입력 (모바일 file input 제약으로 display:none 대신 시각적으로만 숨김) -->
+    <!-- 카메라 촬영용 숨김 파일 입력 (모바일 file input 제약으로 display:none 대신 시각적으로만 숨김)
+         촬영 결과는 앱이 읽지 않음 — 카메라 앱으로 사진을 찍기 위한 단축키 용도로만 사용, 사진은 폰 갤러리에 저장됨 -->
     <input type="file" id="image-camera-input" class="visually-hidden" accept="image/*" capture="environment" />
 
     <!-- 검색 & 필터 -->
@@ -95,7 +93,6 @@
       </div>
       <div class="detail-body">
         <p id="detail-content" class="detail-content"></p>
-        <div id="detail-images" class="detail-images"></div>
         <p id="detail-date" class="detail-date"></p>
       </div>
       <div class="detail-actions">
@@ -139,7 +136,6 @@
   <!-- 토스트 알림 -->
   <div id="toast" class="toast" hidden></div>
 
-  <script src="js/image-store.js"></script>
   <script src="js/app.js"></script>
   <script src="js/sw-register.js"></script>
 </body>

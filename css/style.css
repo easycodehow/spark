@@ -355,60 +355,11 @@ body {
   margin-top: 12px;
 }
 
-/* 이미지 추가 / 카메라 버튼을 먼저 배치하고 나머지 버튼은 오른쪽 끝으로 정렬 */
+/* 카메라 버튼을 먼저 배치하고 나머지 버튼은 오른쪽 끝으로 정렬 */
 .editor-image-buttons {
   display: flex;
   gap: 4px;
   margin-right: auto;
-}
-
-/* 에디터 첨부 이미지 미리보기 */
-.editor-image-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.editor-image-preview:empty {
-  display: none;
-}
-
-.editor-image-thumb {
-  position: relative;
-  width: 64px;
-  height: 64px;
-}
-
-.editor-image-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid rgba(192, 57, 43, 0.4);
-}
-
-.editor-image-remove-btn {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  border: none;
-  background-color: var(--color-text-title);
-  color: #FFFFFF;
-  font-size: 12px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-[data-theme="dark"] .editor-image-remove-btn {
-  background-color: var(--color-text-title-dark);
-  color: var(--color-bg-dark);
 }
 
 .icon-btn {
@@ -700,25 +651,6 @@ body {
 
 [data-theme="dark"] .detail-content {
   color: var(--color-text-title-dark);
-}
-
-.detail-images {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.detail-images:empty {
-  display: none;
-}
-
-.detail-images img {
-  width: 96px;
-  height: 96px;
-  object-fit: cover;
-  border-radius: 6px;
-  border: 1px solid rgba(192, 57, 43, 0.4);
 }
 
 .detail-date {
