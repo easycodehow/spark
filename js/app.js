@@ -17,6 +17,9 @@ let activeFolder = 'ALL'; // 'ALL' | 'UNCLASSIFIED' | 실제 폴더명
 // 메모 첫 줄이 "폴더명/" 형식(슬래시나 공백 없는 이름 + 슬래시 하나)이면 폴더로 인식
 const FOLDER_LINE_PATTERN = /^([^\s/]+)\/$/;
 
+// 새 메모(빈 글쓰기 폼)에서 음성 녹음을 시작하면 자동으로 이 폴더에 저장되도록 첫 줄에 넣는다
+const VOICE_MEMO_FOLDER = '녹취';
+
 // ===== DOM 참조 =====
 const memoInput = document.getElementById('memo-input');
 const starToggle = document.getElementById('star-toggle');
@@ -637,7 +640,16 @@ function createRecognition() {
 function startRecording() {
   if (!SpeechRecognitionCtor || isRecording) return;
   recordStartValue = memoInput.value;
-  recordInsertPos = memoInput.selectionStart;
+
+  // 새 메모(편집 중이 아니고 글쓰기 폼이 비어있음)라면 "녹취/" 폴더 줄을 자동으로 넣는다.
+  // 이미 내용이 있거나 기존 메모를 편집 중이면 기존 폴더/내용을 그대로 둔다.
+  if (!editingId && memoInput.value.trim() === '') {
+    memoInput.value = `${VOICE_MEMO_FOLDER}/\n`;
+    recordInsertPos = memoInput.value.length;
+  } else {
+    recordInsertPos = memoInput.selectionStart;
+  }
+
   memoInput.focus();
   memoInput.selectionStart = memoInput.selectionEnd = recordInsertPos;
   recognition = createRecognition();
