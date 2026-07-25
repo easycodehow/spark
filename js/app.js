@@ -53,9 +53,7 @@ const detailCopyBtn = document.getElementById('detail-copy-btn');
 const detailDeleteBtn = document.getElementById('detail-delete-btn');
 const detailImages = document.getElementById('detail-images');
 
-const imageAddBtn = document.getElementById('image-add-btn');
 const imageCameraBtn = document.getElementById('image-camera-btn');
-const imageGalleryInput = document.getElementById('image-gallery-input');
 const imageCameraInput = document.getElementById('image-camera-input');
 const editorImagePreview = document.getElementById('editor-image-preview');
 
@@ -564,18 +562,9 @@ saveBtn.addEventListener('click', async () => {
   renderList();
 });
 
-// ===== 이미지 추가 (갤러리) / 카메라 촬영 =====
-imageAddBtn.addEventListener('click', () => {
-  imageGalleryInput.click();
-});
-
+// ===== 카메라 촬영 =====
 imageCameraBtn.addEventListener('click', () => {
   imageCameraInput.click();
-});
-
-imageGalleryInput.addEventListener('change', () => {
-  addImageFile(imageGalleryInput.files[0]);
-  imageGalleryInput.value = '';
 });
 
 imageCameraInput.addEventListener('change', () => {
