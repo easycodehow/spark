@@ -5,9 +5,14 @@ const FONT_SIZE_KEY = 'spark-font-size';
 const FONT_SIZES = ['xs', 's', 'm', 'l', 'xl'];
 const THEME_KEY = 'spark-theme';
 const THEME_COLOR = { light: '#1E3A5F', dark: '#101014' };
+// 기록용 썸네일 최대 크기(정사각형 한 변, px) — 원본은 공유 시트로 갤러리에 저장하고,
+// 메모에는 "사진을 찍었다"는 기록만 남기는 용도라 아주 작게 유지한다.
+const THUMBNAIL_MAX_DIMENSION = 80;
+const THUMBNAIL_QUALITY = 0.5;
 
 let editingId = null;
 let showStarredOnly = false;
+let editorImages = [];
 let activeFolder = 'ALL'; // 'ALL' | 'UNCLASSIFIED' | 실제 폴더명
 
 // 메모 첫 줄이 "폴더명/" 형식(슬래시나 공백 없는 이름 + 슬래시 하나)이면 폴더로 인식
@@ -50,9 +55,11 @@ const detailEditBtn = document.getElementById('detail-edit-btn');
 const detailShareBtn = document.getElementById('detail-share-btn');
 const detailCopyBtn = document.getElementById('detail-copy-btn');
 const detailDeleteBtn = document.getElementById('detail-delete-btn');
+const detailImages = document.getElementById('detail-images');
 
 const imageCameraBtn = document.getElementById('image-camera-btn');
 const imageCameraInput = document.getElementById('image-camera-input');
+const editorImagePreview = document.getElementById('editor-image-preview');
 
 const micBtn = document.getElementById('mic-btn');
 const micCancelBtn = document.getElementById('mic-cancel-btn');
@@ -96,13 +103,14 @@ function extractFolder(content) {
 }
 
 // ===== CRUD =====
-function createMemo(content, starred, folder) {
+function createMemo(content, starred, folder, images) {
   const now = new Date().toISOString();
   const memo = {
     id: generateId(),
     content,
     folder: folder || null,
     starred,
+    images,
     createdAt: now,
     updatedAt: now,
   };
@@ -168,6 +176,8 @@ function resetEditor() {
   memoInput.value = '';
   memoInput.style.height = '';
   starToggle.setAttribute('aria-pressed', 'false');
+  editorImages = [];
+  renderEditorImagePreview();
   stopRecording();
 }
 
@@ -176,6 +186,8 @@ function loadMemoIntoEditor(memo) {
   memoInput.value = memo.content;
   autoGrowMemoInput();
   starToggle.setAttribute('aria-pressed', String(memo.starred));
+  editorImages = [...(memo.images || [])];
+  renderEditorImagePreview();
   memoInput.focus();
 }
 
@@ -191,11 +203,104 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 
+// ===== 기록용 썸네일 =====
+// 사진 원본은 공유 시트/다운로드로 폰에 남기고, 메모에는 "사진을 찍었다"는 기록용으로
+// 아주 작은 썸네일만 base64로 담는다. 용량이 작아 IndexedDB 없이 LocalStorage로 충분하다.
+function renderEditorImagePreview() {
+  editorImagePreview.innerHTML = '';
+  editorImages.forEach((base64, index) => {
+    const thumb = document.createElement('div');
+    thumb.className = 'editor-image-thumb';
+
+    const img = document.createElement('img');
+    img.src = base64;
+    img.alt = `사진 기록 ${index + 1}`;
+
+    const removeBtn = document.createElement('button');
+    removeBtn.type = 'button';
+    removeBtn.className = 'editor-image-remove-btn';
+    removeBtn.textContent = '×';
+    removeBtn.setAttribute('aria-label', '사진 기록 삭제');
+    removeBtn.addEventListener('click', () => {
+      editorImages.splice(index, 1);
+      renderEditorImagePreview();
+    });
+
+    thumb.append(img, removeBtn);
+    editorImagePreview.appendChild(thumb);
+  });
+}
+
+function readFileAsDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+}
+
+function loadImageElement(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('이미지를 불러올 수 없습니다.'));
+    img.src = dataUrl;
+  });
+}
+
+// 사진 파일을 아주 작은 정사각형 썸네일(최대 80px, 저화질 JPEG)로 축소한다.
+async function createThumbnail(file) {
+  const originalDataUrl = await readFileAsDataURL(file);
+  const img = await loadImageElement(originalDataUrl);
+
+  const scale = Math.min(1, THUMBNAIL_MAX_DIMENSION / Math.max(img.naturalWidth, img.naturalHeight));
+  const width = Math.max(1, Math.round(img.naturalWidth * scale));
+  const height = Math.max(1, Math.round(img.naturalHeight * scale));
+
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, width, height);
+  return canvas.toDataURL('image/jpeg', THUMBNAIL_QUALITY);
+}
+
+// 촬영한 사진 원본을 폰에 확실히 남기기 위해 공유 시트를 띄운다 (사용자가 "이미지 저장" 등을 직접 선택).
+// 파일 공유를 지원하지 않는 브라우저에서는 다운로드로 대체한다.
+async function shareOrDownloadPhoto(file) {
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: '사진 저장' });
+    } catch (err) {
+      // 사용자가 공유를 취소한 경우 등은 무시
+    }
+    return;
+  }
+
+  const url = URL.createObjectURL(file);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = file.name || `spark-photo-${Date.now()}.jpg`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 // ===== 상세보기 =====
 function openDetail(memo) {
   detailMemoId = memo.id;
   detailContent.textContent = memo.content;
   detailDate.textContent = `작성 ${formatDate(memo.createdAt)}  ·  수정 ${formatDate(memo.updatedAt)}`;
+
+  detailImages.innerHTML = '';
+  (memo.images || []).forEach((base64, index) => {
+    const img = document.createElement('img');
+    img.src = base64;
+    img.alt = `사진 기록 ${index + 1}`;
+    detailImages.appendChild(img);
+  });
 
   memoEditorSection.hidden = true;
   memoToolbar.hidden = true;
@@ -230,6 +335,7 @@ function getMemoTitle(memo) {
   const previewLines = hasFolderLine ? lines.slice(1) : lines;
   const firstLine = (previewLines[0] || '').trim();
   if (firstLine) return firstLine;
+  if (memo.images && memo.images.length > 0) return `[사진] ${formatDate(memo.updatedAt)}`;
   return '(내용 없음)';
 }
 
@@ -372,16 +478,17 @@ starToggle.addEventListener('click', () => {
 
 saveBtn.addEventListener('click', () => {
   const content = memoInput.value.trim();
-  if (!content) {
-    showToast('메모 내용을 입력해주세요.');
+  if (!content && editorImages.length === 0) {
+    showToast('메모 내용이나 사진을 추가해주세요.');
     return;
   }
   const starred = starToggle.getAttribute('aria-pressed') === 'true';
   const folder = extractFolder(content);
+  const images = [...editorImages];
 
   const saved = editingId
-    ? updateMemo(editingId, { content, starred, folder })
-    : createMemo(content, starred, folder);
+    ? updateMemo(editingId, { content, starred, folder, images })
+    : createMemo(content, starred, folder, images);
 
   if (!saved) {
     showToast('저장 공간이 부족해 메모를 저장하지 못했습니다.');
@@ -395,14 +502,26 @@ saveBtn.addEventListener('click', () => {
 });
 
 // ===== 카메라 =====
-// 카메라를 열어 사진을 찍기 위한 단축키 용도로만 사용한다. 찍은 사진은 앱이 읽지도 저장하지도 않으며,
-// 폰의 카메라 앱을 통해 평소처럼 갤러리에 저장된다.
+// 카메라 버튼은 사진 촬영 단축키 용도. 촬영한 원본은 공유 시트(또는 다운로드)로 폰에 확실히 남기고,
+// 메모에는 "사진을 찍었다"는 기록용으로 아주 작은 썸네일만 저장한다.
 imageCameraBtn.addEventListener('click', () => {
   imageCameraInput.click();
 });
 
-imageCameraInput.addEventListener('change', () => {
+imageCameraInput.addEventListener('change', async () => {
+  const file = imageCameraInput.files[0];
   imageCameraInput.value = '';
+  if (!file) return;
+
+  shareOrDownloadPhoto(file);
+
+  try {
+    const thumbnail = await createThumbnail(file);
+    editorImages.push(thumbnail);
+    renderEditorImagePreview();
+  } catch (err) {
+    showToast('사진 기록을 남기지 못했습니다.');
+  }
 });
 
 // ===== 음성 메모 (Web Speech API, A안 - 음성을 텍스트로 변환) =====
@@ -608,6 +727,7 @@ function isValidMemo(memo) {
     typeof memo.content === 'string' &&
     (memo.folder === null || typeof memo.folder === 'string') &&
     typeof memo.starred === 'boolean' &&
+    (memo.images === undefined || Array.isArray(memo.images)) &&
     typeof memo.createdAt === 'string' &&
     typeof memo.updatedAt === 'string'
   );
