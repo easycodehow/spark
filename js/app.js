@@ -456,18 +456,21 @@ function renderList() {
     const actionsDiv = document.createElement('div');
     actionsDiv.className = 'memo-item-actions';
 
-    const starBtn = document.createElement('button');
-    starBtn.type = 'button';
-    starBtn.className = 'memo-star-btn' + (memo.starred ? ' active' : '');
-    starBtn.textContent = '★';
-    starBtn.setAttribute('aria-label', '중요 메모 토글');
-    starBtn.addEventListener('click', (event) => {
-      event.stopPropagation();
-      updateMemo(memo.id, { starred: !memo.starred });
-      renderList();
-    });
+    // 중요 표시된 메모만 별을 보여줌 (중요하지 않은 메모는 별 자리 자체를 만들지 않음)
+    if (memo.starred) {
+      const starBtn = document.createElement('button');
+      starBtn.type = 'button';
+      starBtn.className = 'memo-star-btn active';
+      starBtn.textContent = '★';
+      starBtn.setAttribute('aria-label', '중요 메모 토글');
+      starBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        updateMemo(memo.id, { starred: !memo.starred });
+        renderList();
+      });
 
-    actionsDiv.append(starBtn);
+      actionsDiv.append(starBtn);
+    }
 
     li.append(contentDiv, actionsDiv);
     li.addEventListener('click', () => openDetail(memo));
