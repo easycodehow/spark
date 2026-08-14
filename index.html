@@ -53,9 +53,6 @@
     <section class="memo-editor">
       <textarea id="memo-input" placeholder="메모를 입력하세요..." rows="6"></textarea>
 
-      <!-- 사진 기록용 썸네일 미리보기 (원본은 공유 시트로 갤러리에 저장됨) -->
-      <div id="editor-image-preview" class="editor-image-preview"></div>
-
       <div class="editor-actions">
         <div class="editor-image-buttons">
           <button id="mic-btn" class="icon-btn icon-btn--outlined" type="button" aria-label="음성 메모 시작" aria-pressed="false">
@@ -70,12 +67,6 @@
             </span>
             <span class="icon-btn-label">취소</span>
           </button>
-          <button id="image-camera-btn" class="icon-btn icon-btn--outlined" type="button" aria-label="사진 촬영">
-            <span class="icon-btn-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>
-            </span>
-            <span class="icon-btn-label">촬영</span>
-          </button>
         </div>
         <button id="star-toggle" class="icon-btn icon-btn--star" type="button" aria-label="중요 메모로 표시" aria-pressed="false">
           <span class="icon-btn-icon" aria-hidden="true">
@@ -85,10 +76,6 @@
         <button id="save-btn" class="primary-btn" type="button">저장</button>
       </div>
     </section>
-
-    <!-- 카메라 촬영용 숨김 파일 입력 (모바일 file input 제약으로 display:none 대신 시각적으로만 숨김)
-         촬영 원본은 공유 시트/다운로드로 폰에 남기고, 앱에는 기록용 작은 썸네일만 저장됨 -->
-    <input type="file" id="image-camera-input" class="visually-hidden" accept="image/*" capture="environment" />
 
     <!-- 검색 & 필터 -->
     <section class="memo-toolbar">
@@ -116,7 +103,6 @@
       </div>
       <div class="detail-body">
         <p id="detail-content" class="detail-content"></p>
-        <div id="detail-images" class="detail-images"></div>
         <p id="detail-date" class="detail-date"></p>
       </div>
       <div class="detail-actions">

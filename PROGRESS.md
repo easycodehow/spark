@@ -1453,3 +1453,25 @@
 ### 다음 작업 제안
 - 정해진 로드맵과 이번 세션의 자유 개선 작업 모두 마무리된 상태, 다음 요청 대기
 - 새 작업 시작 시 "시작" 또는 "go" 지시 필요 (CLAUDE.md 승인 원칙에 따름)
+
+---
+
+## 2026-08-14 (이미지 첨부 기능 완전 제거)
+
+### 진행 상황
+- 사용자 요청: "촬영버튼이 기능이 떨어져서 쓸모가 없어. 이미지 관련기능은 제거해줘" — 카메라/썸네일 기능 전체 삭제 결정 (재도입 없이 완전 제거)
+- `index.html`: 촬영 버튼(`#image-camera-btn`), 숨김 파일 입력(`#image-camera-input`), 에디터 썸네일 미리보기(`#editor-image-preview`), 상세보기 썸네일 영역(`#detail-images`) 삭제. 음성 버튼/취소 버튼은 유지
+- `css/style.css`: `.editor-image-preview`, `.editor-image-thumb`, `.editor-image-remove-btn`(다크모드 포함), `.detail-images` 관련 규칙 삭제. `.editor-image-buttons` 래퍼(음성 버튼 감싸는 div)는 클래스명 그대로 유지
+- `js/app.js`
+  - DOM 참조(`detailImages`, `imageCameraBtn`, `imageCameraInput`, `editorImagePreview`), `editorImages` 상태, `THUMBNAIL_MAX_DIMENSION`/`THUMBNAIL_QUALITY` 상수 삭제
+  - `renderEditorImagePreview`, `readFileAsDataURL`, `loadImageElement`, `createThumbnail`, `downloadPhoto`, `shareOrDownloadPhoto`, 카메라 클릭/change 이벤트 리스너 전부 삭제
+  - `createMemo`/`updateMemo` 호출부에서 `images` 인자 제거, 메모 데이터 구조에서 `images` 필드 자체를 더 이상 생성/저장하지 않음
+  - `openDetail`의 썸네일 렌더 로직, `getMemoTitle`의 "[사진]" 제목 대체 로직, `isValidMemo`의 `images` 검증 삭제
+  - 기존에 이미 저장된 메모에 `images` 데이터가 남아있어도 무시되며 오류 없이 동작 (별도 마이그레이션 불필요)
+- `sw.js` 캐시 버전 `v31` → `v32` 상향
+- `CLAUDE.md` 업데이트: "메모 데이터 구조"에서 `images` 필드 제거, 5단계 "이미지 첨부" 체크리스트를 삭제 완료로 표기, 기술스택의 Storage 설명 갱신
+
+### 다음 작업 제안
+- 커밋·푸시·배포 후 **2차 확인 필요**: 실기기에서 (1) 촬영 버튼이 화면에서 사라졌는지, (2) 메모 저장/수정/삭제 등 기존 기능이 정상 동작하는지, (3) 이전에 사진이 첨부됐던 기존 메모를 열어도 오류 없이 잘 보이는지
+- 2차 확인 전까지 다른 기능/수정 작업으로 넘어가지 않음
+- 진행 시 "시작" 또는 "go" 지시 필요 (CLAUDE.md 승인 원칙에 따름)
