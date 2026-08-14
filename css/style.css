@@ -512,6 +512,17 @@ body {
   background-color: #FFFFFF;
 }
 
+/* 검색창에 커서가 가면 별(필터) 버튼을 숨기고 검색창을 100% 너비로 넓히면서
+   정사각형 버튼 높이에 맞출 필요가 없어진 만큼 위아래 패딩을 넉넉하게 줌 */
+#search-input:focus {
+  height: auto;
+  padding: 10px 34px 10px 14px;
+}
+
+.search-input-wrapper:focus-within ~ #filter-toggle {
+  display: none;
+}
+
 [data-theme="dark"] #search-input {
   background-color: var(--color-header-dark);
   color: var(--color-text-title-dark);
