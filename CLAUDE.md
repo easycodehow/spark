@@ -94,12 +94,13 @@
 
 | 역할 | 변수명 | HEX | 용도 |
 |---|---|---|---|
-| Header | `--color-header-dark` | `#15161D` | 다크모드 헤더 배경 |
-| Background | `--color-bg-dark` | `#101014` | 다크모드 페이지 배경 |
+| Header | `--color-header-dark` | `#25272E` | 다크모드 헤더/카드 서피스 배경 |
+| Background | `--color-bg-dark` | `#202125` | 다크모드 페이지 배경 |
 | Title | `--color-text-title-dark` | `#F3DFA0` | 다크모드 제목 텍스트 |
 | Body | `--color-text-body-dark` | `#C7BFA8` | 다크모드 본문 텍스트 |
 | Placeholder | `--color-text-muted-dark` | `#6E6A5C` | 다크모드 플레이스홀더 |
-| Point Pink (dark) | `--color-point-dark` | `#FFB3C8` | 다크모드 별표 아이콘 |
+| Point Pink (dark) | `--color-point-dark` | `#F1A9C7` | 다크모드 별표 아이콘, 강조 버튼 텍스트/테두리 |
+| Point Pink BG (dark) | `--color-point-bg-dark` | `#34202B` | 다크모드 강조 버튼(저장/전체탭/별) 배경 |
 
 #### CSS 변수 선언 규칙
 - 모든 CSS 변수는 `css/style.css` 상단의 `:root {}` 블록에만 선언

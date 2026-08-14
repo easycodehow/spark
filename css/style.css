@@ -14,12 +14,13 @@
 }
 
 [data-theme="dark"] {
-  --color-header-dark: #15161D;
-  --color-bg-dark: #101014;
+  --color-header-dark: #25272E;
+  --color-bg-dark: #202125;
   --color-text-title-dark: #F3DFA0;
   --color-text-body-dark: #C7BFA8;
   --color-text-muted-dark: #6E6A5C;
-  --color-point-dark: #FFB3C8;
+  --color-point-dark: #F1A9C7;
+  --color-point-bg-dark: #34202B;
 }
 
 /* ==========================================================================
@@ -430,8 +431,8 @@ body {
 }
 
 [data-theme="dark"] .icon-btn--star[aria-pressed="true"] {
-  background-color: var(--color-point-dark);
-  color: var(--color-header-dark);
+  background-color: var(--color-point-bg-dark);
+  color: var(--color-point-dark);
 }
 
 .primary-btn {
@@ -451,7 +452,8 @@ body {
 }
 
 [data-theme="dark"] .primary-btn {
-  background-color: var(--color-point-dark);
+  background-color: var(--color-point-bg-dark);
+  color: var(--color-point-dark);
 }
 
 /* 검색 & 필터 */
@@ -522,9 +524,9 @@ body {
 }
 
 [data-theme="dark"] .folder-tab.active {
-  background-color: var(--color-point-dark);
+  background-color: var(--color-point-bg-dark);
   border-color: var(--color-point-dark);
-  color: var(--color-header-dark);
+  color: var(--color-point-dark);
 }
 
 /* 메모 목록 */
