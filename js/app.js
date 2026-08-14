@@ -18,6 +18,7 @@ const VOICE_MEMO_FOLDER = '녹취';
 
 // ===== DOM 참조 =====
 const memoInput = document.getElementById('memo-input');
+const memoClearBtn = document.getElementById('memo-clear-btn');
 const starToggle = document.getElementById('star-toggle');
 const saveBtn = document.getElementById('save-btn');
 const searchInput = document.getElementById('search-input');
@@ -160,12 +161,18 @@ function autoGrowMemoInput() {
   memoInput.style.height = `${memoInput.scrollHeight}px`;
 }
 
+// 입력 내용이 있을 때만 지우기(X) 버튼을 보여줌
+function updateClearButtonVisibility() {
+  memoClearBtn.hidden = memoInput.value === '';
+}
+
 function resetEditor() {
   editingId = null;
   memoInput.value = '';
   memoInput.style.height = '';
   starToggle.setAttribute('aria-pressed', 'false');
   stopRecording();
+  updateClearButtonVisibility();
 }
 
 function loadMemoIntoEditor(memo) {
@@ -173,12 +180,23 @@ function loadMemoIntoEditor(memo) {
   memoInput.value = memo.content;
   autoGrowMemoInput();
   starToggle.setAttribute('aria-pressed', String(memo.starred));
+  updateClearButtonVisibility();
   memoInput.focus();
 }
 
-memoInput.addEventListener('input', autoGrowMemoInput);
+memoInput.addEventListener('input', () => {
+  autoGrowMemoInput();
+  updateClearButtonVisibility();
+});
 memoInput.addEventListener('focus', requestWakeLock);
 memoInput.addEventListener('blur', releaseWakeLock);
+
+memoClearBtn.addEventListener('click', () => {
+  memoInput.value = '';
+  memoInput.style.height = '';
+  updateClearButtonVisibility();
+  memoInput.focus();
+});
 
 // Wake Lock은 탭이 백그라운드로 가면 브라우저가 자동으로 해제하므로,
 // 입력창에 계속 포커스가 남아있는 상태로 화면에 복귀하면 다시 요청한다.
@@ -416,6 +434,7 @@ function insertTextAtCursor(text) {
   recordInsertPos = pos + text.length;
   memoInput.selectionStart = memoInput.selectionEnd = recordInsertPos;
   autoGrowMemoInput();
+  updateClearButtonVisibility();
 }
 
 function createRecognition() {
@@ -465,6 +484,7 @@ function startRecording() {
   if (!editingId && memoInput.value.trim() === '') {
     memoInput.value = `${VOICE_MEMO_FOLDER}/\n`;
     recordInsertPos = memoInput.value.length;
+    updateClearButtonVisibility();
   } else {
     recordInsertPos = memoInput.selectionStart;
   }
@@ -494,6 +514,7 @@ function stopRecording() {
 function cancelRecording() {
   memoInput.value = recordStartValue;
   autoGrowMemoInput();
+  updateClearButtonVisibility();
   stopRecording();
 }
 

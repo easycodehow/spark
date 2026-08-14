@@ -282,11 +282,37 @@ body {
 
 /* 메모 입력 영역 */
 .memo-editor {
+  position: relative;
   background-color: #FFFFFF;
-  border: 1px solid rgba(192, 57, 43, 0.4);
   border-radius: 4px;
   padding: 16px;
   margin-bottom: 16px;
+}
+
+/* 입력 내용 지우기(X) 버튼 - 글을 쓰기 시작하면 우측 상단에 표시 */
+.memo-clear-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.memo-clear-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+[data-theme="dark"] .memo-clear-btn {
+  color: var(--color-text-muted-dark);
 }
 
 [data-theme="dark"] .memo-editor {
@@ -469,7 +495,8 @@ body {
   flex: 1;
   border: 1px solid rgba(192, 57, 43, 0.4);
   border-radius: 4px;
-  padding: 10px 14px;
+  height: 36px;
+  padding: 0 14px;
   font-size: calc(17px * var(--font-scale));
   font-family: inherit;
   color: var(--color-text-title);
