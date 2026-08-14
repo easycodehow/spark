@@ -323,7 +323,7 @@ function renderList() {
 
   memos.forEach((memo) => {
     const li = document.createElement('li');
-    li.className = 'memo-item';
+    li.className = memo.starred ? 'memo-item memo-item--starred' : 'memo-item';
 
     const contentDiv = document.createElement('div');
     contentDiv.className = 'memo-item-content';

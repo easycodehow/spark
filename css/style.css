@@ -562,7 +562,7 @@ body {
 }
 
 [data-theme="dark"] .memo-item-title {
-  color: var(--color-text-title-dark);
+  color: var(--color-text-body-dark);
 }
 
 .memo-item-date {
@@ -594,6 +594,19 @@ body {
 }
 
 [data-theme="dark"] .memo-star-btn.active {
+  color: var(--color-point-dark);
+}
+
+/* 중요(별표) 메모: 핑크 톤온톤 카드로 강조 (다크모드 한정) */
+[data-theme="dark"] .memo-item--starred {
+  background-color: rgba(255, 179, 200, 0.12);
+  border-bottom-color: transparent;
+  border-radius: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+[data-theme="dark"] .memo-item--starred .memo-item-title {
   color: var(--color-point-dark);
 }
 
