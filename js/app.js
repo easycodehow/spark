@@ -22,6 +22,7 @@ const memoClearBtn = document.getElementById('memo-clear-btn');
 const starToggle = document.getElementById('star-toggle');
 const saveBtn = document.getElementById('save-btn');
 const searchInput = document.getElementById('search-input');
+const searchClearBtn = document.getElementById('search-clear-btn');
 const filterToggle = document.getElementById('filter-toggle');
 const folderTabs = document.getElementById('folder-tabs');
 const memoList = document.getElementById('memo-list');
@@ -534,7 +535,22 @@ micBtn.addEventListener('click', () => {
 
 micCancelBtn.addEventListener('click', cancelRecording);
 
-searchInput.addEventListener('input', renderList);
+// 검색어가 있을 때만 지우기(X) 버튼을 보여줌
+function updateSearchClearVisibility() {
+  searchClearBtn.hidden = searchInput.value === '';
+}
+
+searchInput.addEventListener('input', () => {
+  renderList();
+  updateSearchClearVisibility();
+});
+
+searchClearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  updateSearchClearVisibility();
+  renderList();
+  searchInput.focus();
+});
 
 filterToggle.addEventListener('click', () => {
   showStarredOnly = !showStarredOnly;

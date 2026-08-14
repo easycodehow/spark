@@ -1596,3 +1596,38 @@
 ### 다음 작업 제안
 - 커밋 및 배포 진행 예정
 - 새 작업 시작 시 "시작" 또는 "go" 지시 필요 (CLAUDE.md 승인 원칙에 따름)
+
+### 커밋·배포 (2026-08-14 추가)
+- 커밋(`a8911c0`) → GitHub push → Vercel 배포 완료 (`https://spark-zeta-ecru.vercel.app`, 기존 URL 그대로 반영)
+- 서비스워커 캐시 버전 `v34`로 함께 올려 배포 반영 지연 문제 예방
+- **2차 확인(실서버) 아직 미완료**: LAN 테스트로는 확인했으나, 실제 배포 URL 기준 폰 재확인 필요
+
+---
+
+## 2026-08-14 (사용자 피드백 오인 정정 — 검색창 X버튼/포커스 테두리 추가, 글쓰기 폼 border 복원)
+
+### 진행 상황
+- 사용자가 배포 후 "안 바뀌었다"고 보고 → 캐시 문제로 추정해 재확인 요청했으나 시크릿 탭에서도 동일 증상 → 스크린샷(`temp/image copy 2.png`) 요청해 확인
+- 스크린샷 분석 결과, 사용자가 입력하고 있던 곳은 **글쓰기 폼이 아니라 메모검색창**이었음이 확인됨
+  - 글쓰기 폼(`.memo-editor`)은 이미 의도대로 테두리가 제거된 정상 상태였음
+  - 사용자가 본 검은 테두리는 검색창(`#search-input`)의 **브라우저 기본 포커스 아웃라인**(그동안 `outline: none` 처리가 안 되어 있었음)
+  - X버튼은 글쓰기 폼 전용으로만 만들어서 검색창엔 애초에 없었음
+- 사용자 최종 요청 3가지
+  1. 검색창에도 동일하게: 포커스 시 브라우저 기본 아웃라인 안 뜨게(`outline:none`) + 입력 시 X 지우기 버튼
+  2. 정정: "선을 없애라"는 것은 outline만 제거하라는 의미였고 **border는 유지**해야 했음 → 지난 커밋(`a8911c0`)에서 `.memo-editor`의 border를 통째로 지운 게 실수였음, 복원 필요
+  3. 폼(에디터)의 안쪽 여백이 부족해서 불편함
+- 반영 파일
+  - `css/style.css`: `.memo-editor`에 원래 border(`1px solid rgba(192,57,43,0.4)`) 복원, 패딩 `16px→20px`로 확대. `#search-input`에 `outline: none` 추가(기존 border는 유지), `.search-input-wrapper`/`.search-clear-btn` 신설(라이트+다크)
+  - `index.html`: `#search-input`을 `.search-input-wrapper`로 감싸고 `#search-clear-btn`(X 아이콘, 기본 hidden) 추가
+  - `js/app.js`: `searchClearBtn` DOM 참조 추가, `updateSearchClearVisibility()` 함수로 검색어 유무에 따라 X버튼 표시/숨김, 검색창 `input` 이벤트에 연결, X버튼 클릭 시 검색어 비우고 목록 갱신 후 포커스 유지
+- 헤드리스 크롬(CDP)으로 자동화 검증
+  - `.memo-editor` computed border = `1px solid rgba(192, 57, 43, 0.4)`, padding = `20px` 확인
+  - `#search-input` 포커스 상태에서 computed outline-style = `none`, border-style = `solid`(유지) 확인
+  - 검색어 입력 → X버튼 표시(`hidden:false`) → 클릭 → 검색어 비워지고 X버튼 재숨김(`hidden:true`) 확인
+  - 라이트/다크모드 스크린샷 모두 확인, 별 필터 버튼 정사각형 유지 확인
+- 테스트 서버·헤드리스 크롬 프로세스 정리 완료
+
+### 다음 작업 제안
+- **2차 확인 필요**: 아직 커밋/푸시/배포 전 — 실기기에서 (1) 글쓰기 폼에 테두리+넉넉한 여백이 돌아왔는지 (2) 검색창 포커스 시 검은 테두리 없이 기존 핑크 테두리만 보이는지 (3) 검색어 입력 시 X버튼으로 지워지는지 확인
+- 2차 확인 후 커밋 및 배포 진행 (배포 시 서비스워커 캐시 버전도 함께 상향 필요)
+- 새 작업 시작 시 "시작" 또는 "go" 지시 필요 (CLAUDE.md 승인 원칙에 따름)

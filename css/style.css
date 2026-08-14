@@ -284,8 +284,9 @@ body {
 .memo-editor {
   position: relative;
   background-color: #FFFFFF;
+  border: 1px solid rgba(192, 57, 43, 0.4);
   border-radius: 4px;
-  padding: 16px;
+  padding: 20px;
   margin-bottom: 16px;
 }
 
@@ -491,12 +492,20 @@ body {
   margin-bottom: 16px;
 }
 
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
 #search-input {
   flex: 1;
+  min-width: 0;
   border: 1px solid rgba(192, 57, 43, 0.4);
+  outline: none;
   border-radius: 4px;
   height: 36px;
-  padding: 0 14px;
+  padding: 0 34px 0 14px;
   font-size: calc(17px * var(--font-scale));
   font-family: inherit;
   color: var(--color-text-title);
@@ -514,6 +523,33 @@ body {
 }
 
 [data-theme="dark"] #search-input::placeholder {
+  color: var(--color-text-muted-dark);
+}
+
+/* 검색어 지우기(X) 버튼 - 검색어를 입력하면 우측에 표시 */
+.search-clear-btn {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-clear-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+[data-theme="dark"] .search-clear-btn {
   color: var(--color-text-muted-dark);
 }
 

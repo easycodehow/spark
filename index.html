@@ -82,7 +82,12 @@
 
     <!-- 검색 & 필터 -->
     <section class="memo-toolbar">
-      <input type="text" id="search-input" placeholder="메모 검색" />
+      <div class="search-input-wrapper">
+        <input type="text" id="search-input" placeholder="메모 검색" />
+        <button id="search-clear-btn" class="search-clear-btn" type="button" aria-label="검색어 지우기" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
       <button id="filter-toggle" class="icon-btn icon-btn--star" type="button" aria-label="중요 메모만 보기" aria-pressed="false">
         <span class="icon-btn-icon" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
