@@ -104,7 +104,8 @@
 | Title | `--color-text-title-dark` | `#EDEAE3` | 다크모드 제목 텍스트 |
 | Body | `--color-text-body-dark` | `#ACABA4` | 다크모드 본문 텍스트 |
 | Placeholder | `--color-text-muted-dark` | `#6E6A5C` | 다크모드 플레이스홀더 |
-| Point Pink (dark) | `--color-point-dark` | `#DB9EB9` | 다크모드 별표 아이콘, 강조 버튼 텍스트/테두리 |
+| Point Pink (dark) | `--color-point-dark` | `#DB9EB9` | 다크모드 별표 아이콘, 강조 버튼 텍스트 |
+| Point Pink Border (dark) | `--color-point-border-dark` | `rgba(219, 158, 185, 0.1)` | 다크모드 별표 버튼/저장 버튼 테두리 (Point Pink dark 10% 불투명도) |
 | Point Pink BG (dark) | `--color-point-bg-dark` | `#34202B` | 다크모드 강조 버튼(저장/전체탭/별) 배경 |
 | Mint (dark) | `--color-mint-dark` | `#7FE1BA` | 다크모드 음성 버튼 텍스트/아이콘 |
 | Mint BG (dark) | `--color-mint-bg-dark` | `#172820` | 다크모드 음성 버튼 배경 |

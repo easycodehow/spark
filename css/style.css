@@ -25,6 +25,7 @@
   --color-text-body-dark: #ACABA4;
   --color-text-muted-dark: #6E6A5C;
   --color-point-dark: #DB9EB9;
+  --color-point-border-dark: rgba(219, 158, 185, 0.1);
   --color-point-bg-dark: #34202B;
   --color-mint-dark: #7FE1BA;
   --color-mint-bg-dark: #172820;
@@ -475,7 +476,7 @@ body {
 }
 
 [data-theme="dark"] .icon-btn--star {
-  border-color: var(--color-point-dark);
+  border-color: var(--color-point-border-dark);
   color: var(--color-point-dark);
 }
 
@@ -501,6 +502,7 @@ body {
 }
 
 [data-theme="dark"] .primary-btn {
+  border: 1px solid var(--color-point-border-dark);
   background-color: var(--color-point-bg-dark);
   color: var(--color-point-dark);
 }
