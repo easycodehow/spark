@@ -8,6 +8,7 @@
   --color-point-bg: #FDE3EC;
   --color-mint: #2F8F69;
   --color-mint-bg: #DFF3EA;
+  --color-mint-border: rgba(47, 143, 105, 0.2);
   --color-border: #FDE3EC;
 
   /* Light Mode */
@@ -25,10 +26,11 @@
   --color-text-body-dark: #ACABA4;
   --color-text-muted-dark: #6E6A5C;
   --color-point-dark: #DB9EB9;
-  --color-point-border-dark: rgba(219, 158, 185, 0.1);
+  --color-point-border-dark: rgba(219, 158, 185, 0.2);
   --color-point-bg-dark: #34202B;
   --color-mint-dark: #7FE1BA;
   --color-mint-bg-dark: #172820;
+  --color-mint-border-dark: rgba(127, 225, 186, 0.2);
   --color-border-dark: rgba(219, 158, 185, 0.35);
 }
 
@@ -446,12 +448,13 @@ body {
 
 /* 음성 버튼: 민트 톤 배지 */
 #mic-btn.icon-btn--outlined {
-  border-color: transparent;
+  border-color: var(--color-mint-border);
   background-color: var(--color-mint-bg);
   color: var(--color-mint);
 }
 
 [data-theme="dark"] #mic-btn.icon-btn--outlined {
+  border-color: var(--color-mint-border-dark);
   background-color: var(--color-mint-bg-dark);
   color: var(--color-mint-dark);
 }
@@ -625,7 +628,7 @@ body {
 
 [data-theme="dark"] .folder-tab.active {
   background-color: var(--color-point-bg-dark);
-  border-color: var(--color-point-dark);
+  border-color: var(--color-point-border-dark);
   color: var(--color-point-dark);
 }
 

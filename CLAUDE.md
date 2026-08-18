@@ -83,6 +83,7 @@
 | Point Pink BG | `--color-point-bg` | `#FDE3EC` | 저장 버튼/전체 탭/별표 배경 |
 | Mint | `--color-mint` | `#2F8F69` | 음성 버튼 텍스트/아이콘 |
 | Mint BG | `--color-mint-bg` | `#DFF3EA` | 음성 버튼 배경 |
+| Mint Border | `--color-mint-border` | `rgba(47, 143, 105, 0.2)` | 음성 버튼 테두리 (Mint 20% 불투명도) |
 | Border | `--color-border` | `#FDE3EC` | 카드/입력창/필터탭 테두리 |
 
 #### Light Mode
@@ -105,9 +106,10 @@
 | Body | `--color-text-body-dark` | `#ACABA4` | 다크모드 본문 텍스트 |
 | Placeholder | `--color-text-muted-dark` | `#6E6A5C` | 다크모드 플레이스홀더 |
 | Point Pink (dark) | `--color-point-dark` | `#DB9EB9` | 다크모드 별표 아이콘, 강조 버튼 텍스트 |
-| Point Pink Border (dark) | `--color-point-border-dark` | `rgba(219, 158, 185, 0.1)` | 다크모드 별표 버튼/저장 버튼 테두리 (Point Pink dark 10% 불투명도) |
+| Point Pink Border (dark) | `--color-point-border-dark` | `rgba(219, 158, 185, 0.2)` | 다크모드 별표/저장/전체 탭 테두리 (Point Pink dark 20% 불투명도) |
 | Point Pink BG (dark) | `--color-point-bg-dark` | `#34202B` | 다크모드 강조 버튼(저장/전체탭/별) 배경 |
 | Mint (dark) | `--color-mint-dark` | `#7FE1BA` | 다크모드 음성 버튼 텍스트/아이콘 |
+| Mint Border (dark) | `--color-mint-border-dark` | `rgba(127, 225, 186, 0.2)` | 다크모드 음성 버튼 테두리 (Mint dark 20% 불투명도) |
 | Mint BG (dark) | `--color-mint-bg-dark` | `#172820` | 다크모드 음성 버튼 배경 |
 | Border (dark) | `--color-border-dark` | `rgba(219, 158, 185, 0.35)` | 다크모드 카드/입력창/필터탭 테두리 |
 
