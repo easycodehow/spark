@@ -79,28 +79,36 @@
 | 역할 | 변수명 | HEX | 용도 |
 |---|---|---|---|
 | Brand Navy | `--color-brand` | `#1E3A5F` | 헤더 배경 (앱 아이콘 워드마크 글자색과 동일) |
-| Point Pink | `--color-point` | `#FF6FB0` | 별표 아이콘, 중요 메모 강조 |
+| Point Pink | `--color-point` | `#D5488C` | 저장 버튼/전체 탭 텍스트, 별표 아이콘 강조 |
+| Point Pink BG | `--color-point-bg` | `#FDE3EC` | 저장 버튼/전체 탭/별표 배경 |
+| Mint | `--color-mint` | `#2F8F69` | 음성 버튼 텍스트/아이콘 |
+| Mint BG | `--color-mint-bg` | `#DFF3EA` | 음성 버튼 배경 |
+| Border | `--color-border` | `#FDE3EC` | 카드/입력창/필터탭 테두리 |
 
 #### Light Mode
 
 | 역할 | 변수명 | HEX | 용도 |
 |---|---|---|---|
-| Background | `--color-bg` | `#FDF6E7` | 페이지 전체 배경 |
+| Background | `--color-bg` | `#FFF9E9` | 페이지 전체 배경 |
 | Title | `--color-text-title` | `#22242E` | 제목, 강조 텍스트 |
-| Body | `--color-text-body` | `#514F5C` | 본문, 일반 텍스트 |
+| Body | `--color-text-body` | `#494949` | 본문, 일반 텍스트 |
 | Placeholder | `--color-text-muted` | `#BFB5A3` | 플레이스홀더, 비활성 텍스트 |
 
 #### Dark Mode
 
 | 역할 | 변수명 | HEX | 용도 |
 |---|---|---|---|
-| Header | `--color-header-dark` | `#25272E` | 다크모드 헤더/카드 서피스 배경 |
-| Background | `--color-bg-dark` | `#202125` | 다크모드 페이지 배경 |
-| Title | `--color-text-title-dark` | `#F3DFA0` | 다크모드 제목 텍스트 |
-| Body | `--color-text-body-dark` | `#C7BFA8` | 다크모드 본문 텍스트 |
+| Header | `--color-header-bg-dark` | `#000000` | 다크모드 헤더 배경 |
+| Surface | `--color-header-dark` | `#202125` | 다크모드 카드/입력창/필터탭 서피스 배경 |
+| Background | `--color-bg-dark` | `#161518` | 다크모드 페이지 배경 |
+| Title | `--color-text-title-dark` | `#EDEAE3` | 다크모드 제목 텍스트 |
+| Body | `--color-text-body-dark` | `#ACABA4` | 다크모드 본문 텍스트 |
 | Placeholder | `--color-text-muted-dark` | `#6E6A5C` | 다크모드 플레이스홀더 |
-| Point Pink (dark) | `--color-point-dark` | `#F1A9C7` | 다크모드 별표 아이콘, 강조 버튼 텍스트/테두리 |
+| Point Pink (dark) | `--color-point-dark` | `#DB9EB9` | 다크모드 별표 아이콘, 강조 버튼 텍스트/테두리 |
 | Point Pink BG (dark) | `--color-point-bg-dark` | `#34202B` | 다크모드 강조 버튼(저장/전체탭/별) 배경 |
+| Mint (dark) | `--color-mint-dark` | `#7FE1BA` | 다크모드 음성 버튼 텍스트/아이콘 |
+| Mint BG (dark) | `--color-mint-bg-dark` | `#172820` | 다크모드 음성 버튼 배경 |
+| Border (dark) | `--color-border-dark` | `rgba(219, 158, 185, 0.35)` | 다크모드 카드/입력창/필터탭 테두리 |
 
 #### CSS 변수 선언 규칙
 - 모든 CSS 변수는 `css/style.css` 상단의 `:root {}` 블록에만 선언
