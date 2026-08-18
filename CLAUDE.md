@@ -93,6 +93,7 @@
 | Background | `--color-bg` | `#FFF9E9` | 페이지 전체 배경 |
 | Title | `--color-text-title` | `#22242E` | 제목, 강조 텍스트 |
 | Body | `--color-text-body` | `#494949` | 본문, 일반 텍스트 |
+| Body Border | `--color-text-body-border` | `rgba(73, 73, 73, 0.2)` | 미선택 필터탭 테두리 (Body 20% 불투명도) |
 | Placeholder | `--color-text-muted` | `#BFB5A3` | 플레이스홀더, 비활성 텍스트 |
 
 #### Dark Mode
@@ -104,6 +105,7 @@
 | Background | `--color-bg-dark` | `#161518` | 다크모드 페이지 배경 |
 | Title | `--color-text-title-dark` | `#EDEAE3` | 다크모드 제목 텍스트 |
 | Body | `--color-text-body-dark` | `#ACABA4` | 다크모드 본문 텍스트 |
+| Body Border (dark) | `--color-text-body-border-dark` | `rgba(172, 171, 164, 0.2)` | 다크모드 미선택 필터탭 테두리 (Body dark 20% 불투명도) |
 | Placeholder | `--color-text-muted-dark` | `#6E6A5C` | 다크모드 플레이스홀더 |
 | Point Pink (dark) | `--color-point-dark` | `#DB9EB9` | 다크모드 별표 아이콘, 강조 버튼 텍스트 |
 | Point Pink Border (dark) | `--color-point-border-dark` | `rgba(219, 158, 185, 0.2)` | 다크모드 별표/저장/전체 탭 테두리 (Point Pink dark 20% 불투명도) |

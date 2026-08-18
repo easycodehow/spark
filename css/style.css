@@ -15,6 +15,7 @@
   --color-bg: #FFF9E9;
   --color-text-title: #22242E;
   --color-text-body: #494949;
+  --color-text-body-border: rgba(73, 73, 73, 0.2);
   --color-text-muted: #BFB5A3;
 }
 
@@ -24,6 +25,7 @@
   --color-bg-dark: #161518;
   --color-text-title-dark: #EDEAE3;
   --color-text-body-dark: #ACABA4;
+  --color-text-body-border-dark: rgba(172, 171, 164, 0.2);
   --color-text-muted-dark: #6E6A5C;
   --color-point-dark: #DB9EB9;
   --color-point-border-dark: rgba(219, 158, 185, 0.2);
@@ -603,7 +605,7 @@ body {
 
 .folder-tab {
   flex: none;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-text-body-border);
   border-radius: 999px;
   padding: 6px 14px;
   font-size: calc(14px * var(--font-scale));
@@ -622,7 +624,7 @@ body {
 
 [data-theme="dark"] .folder-tab {
   background-color: var(--color-header-dark);
-  border-color: transparent;
+  border-color: var(--color-text-body-border-dark);
   color: var(--color-text-body-dark);
 }
 
