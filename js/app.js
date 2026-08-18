@@ -575,11 +575,26 @@ moreMenuToggle.addEventListener('click', (event) => {
   }
 });
 
+// 메뉴가 열린 상태에서 바깥을 클릭하면 그 클릭으로 메뉴만 닫히고, 클릭 대상(버튼/입력창 등)에는
+// 아무 동작도 전달되지 않도록 캡처 단계에서 먼저 가로챈다 (모달 바탕 클릭과 동일한 동작).
+function isOutsideMoreMenu(target) {
+  return !moreMenu.hidden && !moreMenu.contains(target) && target !== moreMenuToggle;
+}
+
+document.addEventListener('mousedown', (event) => {
+  if (isOutsideMoreMenu(event.target)) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+}, true);
+
 document.addEventListener('click', (event) => {
-  if (moreMenu.hidden) return;
-  if (moreMenu.contains(event.target) || event.target === moreMenuToggle) return;
-  closeMoreMenu();
-});
+  if (isOutsideMoreMenu(event.target)) {
+    event.preventDefault();
+    event.stopPropagation();
+    closeMoreMenu();
+  }
+}, true);
 
 // ===== 메모 내보내기 =====
 function exportMemos() {
